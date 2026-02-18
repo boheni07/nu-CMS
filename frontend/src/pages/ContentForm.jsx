@@ -14,6 +14,7 @@ const ContentForm = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
+    const editorRef = React.useRef(null);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = !!id;
@@ -164,26 +165,27 @@ const ContentForm = () => {
                         <RangePicker showTime format="YYYY-MM-DD HH:mm:ss" style={{ width: '100%' }} />
                     </Form.Item>
 
-                    <Form.Item label="본문 (에디터)">
-                        <Editor
-                            apiKey="no-api-key"
-                            init={{
-                                height: 500,
-                                menubar: true,
-                                plugins: [
-                                    'advlist autolink lists link image charmap print preview anchor',
-                                    'searchreplace visualblocks code fullscreen',
-                                    'insertdatetime media table paste code help wordcount'
-                                ],
-                                toolbar:
-                                    'undo redo | formatselect | bold italic backcolor | \
-                  alignleft aligncenter alignright alignjustify | \
-                  bullist numlist outdent indent | removeformat | help'
-                            }}
-                            value={content}
-                            onEditorChange={(newContent) => setContent(newContent)}
-                        />
-                    </Form.Item>
+                    <div style={{ marginTop: 24 }}>
+                        <Form.Item label="콘텐츠 내용">
+                            <Editor
+                                apiKey="d88o6c5oblq1k6vca7p8wvr7wqreu2kflo1heh533ilcwtab"
+                                onInit={(evt, editor) => editorRef.current = editor}
+                                value={content}
+                                init={{
+                                    height: 500,
+                                    menubar: true,
+                                    plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen',
+                                        'insertdatetime media table paste code help wordcount'
+                                    ],
+                                    toolbar:
+                                        'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
+                                }}
+                                onEditorChange={(newContent) => setContent(newContent)}
+                            />
+                        </Form.Item>
+                    </div>
 
                     <Form.Item name="sttusCode" label="워크플로우 상태">
                         <Select style={{ width: 200 }}>
@@ -205,7 +207,7 @@ const ContentForm = () => {
                     </Form.Item>
                 </Form>
             </Card>
-        </div>
+        </div >
     );
 };
 

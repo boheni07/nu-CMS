@@ -110,7 +110,7 @@ const BoardManagement = () => {
             title: '게시판 ID',
             dataIndex: 'bbsId',
             key: 'bbsId',
-            width: 180,
+            width: 170,
             align: 'center',
             render: (text) => <span style={{ fontFamily: 'monospace', color: '#666' }}>{text}</span>,
         },
@@ -118,7 +118,7 @@ const BoardManagement = () => {
             title: '유형',
             dataIndex: 'bbsTyCode',
             key: 'bbsTyCode',
-            width: 100,
+            width: 80,
             align: 'center',
             render: (code) => {
                 const typeMap = { 'BBST01': '일반', 'BBST02': '공지' };
@@ -129,7 +129,7 @@ const BoardManagement = () => {
             title: '사용여부',
             dataIndex: 'useAt',
             key: 'useAt',
-            width: 80,
+            width: 70,
             align: 'center',
             render: (useAt) => {
                 const isUse = useAt === 'Y';
@@ -140,22 +140,22 @@ const BoardManagement = () => {
             title: '등록일',
             dataIndex: 'frstRegistPnttm',
             key: 'frstRegistPnttm',
-            width: 120,
+            width: 100,
             align: 'center',
             render: (val) => val ? new Date(val).toLocaleDateString() : '-'
         },
         {
             title: '관리',
             key: 'action',
-            width: 280,
+            width: 200,
             align: 'center',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button icon={<FileTextOutlined />} size="small" onClick={() => handleManage(record)}>관리</Button>
                     <Button icon={<EditOutlined />} size="small" onClick={() => handleEdit(record)}>수정</Button>
                     <Popconfirm
                         title="게시판 삭제"
-                        description="정말로 이 게시판을 삭제하시겠습니까? (포함된 게시물도 삭제될 수 있습니다)"
+                        description="정말로 이 게시판을 삭제하시겠습니까?"
                         onConfirm={() => handleDelete(record.bbsId)}
                         okText="삭제"
                         cancelText="취소"
@@ -185,6 +185,8 @@ const BoardManagement = () => {
                     rowKey="bbsId"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
 

@@ -84,7 +84,7 @@ const MemberManagement = () => {
             title: '고유 ID',
             dataIndex: 'esntlId',
             key: 'esntlId',
-            width: 150,
+            width: 120,
             align: 'center',
             ellipsis: true,
         },
@@ -92,7 +92,7 @@ const MemberManagement = () => {
             title: '회원 ID',
             dataIndex: 'mberId',
             key: 'mberId',
-            width: 120,
+            width: 100,
             align: 'center',
             render: (text) => <b>{text}</b>,
         },
@@ -100,7 +100,7 @@ const MemberManagement = () => {
             title: '이름',
             dataIndex: 'mberNm',
             key: 'mberNm',
-            width: 100,
+            width: 90,
             align: 'center',
         },
         {
@@ -113,7 +113,7 @@ const MemberManagement = () => {
             title: '상태',
             dataIndex: 'mberSttusCode',
             key: 'mberSttusCode',
-            width: 100,
+            width: 80,
             align: 'center',
             render: (code) => {
                 const statusMap = {
@@ -130,23 +130,23 @@ const MemberManagement = () => {
             title: '가입일',
             dataIndex: 'frstRegistPnttm',
             key: 'frstRegistPnttm',
-            width: 150,
+            width: 120,
             align: 'center',
             render: (date) => date ? new Date(date).toLocaleDateString() : '-',
         },
         {
             title: '관리',
             key: 'action',
-            width: 220,
+            width: 180,
             align: 'center',
             render: (_, record) => (
-                <Space size="middle">
+                <Space size="small">
                     <Button
                         size="small"
                         icon={<KeyOutlined />}
                         onClick={() => showRoleModal(record)}
                     >
-                        권한 설정
+                        권한
                     </Button>
                     {record.mberSttusCode === 'A' ? (
                         <Button
@@ -155,7 +155,7 @@ const MemberManagement = () => {
                             icon={<StopOutlined />}
                             onClick={() => handleStatusUpdate(record.esntlId, 'P')}
                         >
-                            계정 잠금
+                            잠금
                         </Button>
                     ) : (
                         <Button
@@ -165,7 +165,7 @@ const MemberManagement = () => {
                             icon={<CheckCircleOutlined />}
                             onClick={() => handleStatusUpdate(record.esntlId, 'A')}
                         >
-                            정상 복구
+                            복구
                         </Button>
                     )}
                 </Space>
@@ -190,6 +190,8 @@ const MemberManagement = () => {
                     dataSource={members}
                     rowKey="esntlId"
                     loading={loading}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
 

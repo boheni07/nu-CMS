@@ -89,7 +89,7 @@ const WidgetManagement = () => {
             title: '위젯 ID',
             dataIndex: 'widgetId',
             key: 'widgetId',
-            width: 180,
+            width: 140,
             align: 'center',
         },
         {
@@ -102,7 +102,7 @@ const WidgetManagement = () => {
             title: '유형',
             dataIndex: 'widgetTyCode',
             key: 'widgetTyCode',
-            width: 120,
+            width: 100,
             align: 'center',
             render: (type) => {
                 const types = {
@@ -118,7 +118,7 @@ const WidgetManagement = () => {
             title: '사용여부',
             dataIndex: 'useAt',
             key: 'useAt',
-            width: 100,
+            width: 80,
             align: 'center',
             render: (use) => <Tag color={use === 'Y' ? 'green' : 'red'}>{use === 'Y' ? '사용' : '미사용'}</Tag>,
         },
@@ -126,19 +126,19 @@ const WidgetManagement = () => {
             title: '등록일',
             dataIndex: 'frstRegistPnttm',
             key: 'frstRegistPnttm',
-            width: 160,
+            width: 120,
             align: 'center',
             render: (val) => val ? new Date(val).toLocaleDateString() : '-'
         },
         {
             title: '관리',
             key: 'action',
-            width: 180,
+            width: 150,
             align: 'center',
             render: (_, record) => (
-                <Space size="middle">
-                    <Button icon={<EditOutlined />} onClick={() => showModal(record)}>수정</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.widgetId)}>삭제</Button>
+                <Space size="small">
+                    <Button icon={<EditOutlined />} size="small" onClick={() => showModal(record)}>수정</Button>
+                    <Button icon={<DeleteOutlined />} size="small" danger onClick={() => handleDelete(record.widgetId)}>삭제</Button>
                 </Space>
             ),
         },
@@ -166,6 +166,8 @@ const WidgetManagement = () => {
                     rowKey="widgetId"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
 

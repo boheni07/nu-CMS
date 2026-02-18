@@ -109,7 +109,7 @@ const RoleManagement = () => {
             title: '역할 코드',
             dataIndex: 'roleCode',
             key: 'roleCode',
-            width: 150,
+            width: 120,
             align: 'center',
             render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>,
         },
@@ -117,7 +117,7 @@ const RoleManagement = () => {
             title: '역할 명',
             dataIndex: 'roleNm',
             key: 'roleNm',
-            width: 150,
+            width: 120,
             align: 'center',
         },
         {
@@ -129,10 +129,10 @@ const RoleManagement = () => {
         {
             title: '작업',
             key: 'action',
-            width: 180,
+            width: 150,
             align: 'center',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button size="small" icon={<EditOutlined />} onClick={() => showEditModal(record)}>수정</Button>
                     <Button size="small" type="primary" ghost icon={<SafetyCertificateOutlined />} onClick={() => handleRoleSelect(record)}>권한 설정</Button>
                 </Space>
@@ -163,6 +163,8 @@ const RoleManagement = () => {
                                 onClick: () => handleRoleSelect(record),
                                 style: { cursor: 'pointer', background: selectedRole?.roleCode === record.roleCode ? '#e6f7ff' : 'inherit' }
                             })}
+                            size="small"
+                            style={{ tableLayout: 'fixed' }}
                         />
                     </Card>
                 </Col>

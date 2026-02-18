@@ -47,11 +47,11 @@ const AuditLogList = () => {
     };
 
     const accessColumns = [
-        { title: 'No', dataIndex: 'logId', key: 'logId', width: 70, sorter: (a, b) => b.logId - a.logId },
-        { title: '일시', dataIndex: 'creatPnttm', key: 'creatPnttm', width: 160, render: (date) => new Date(date).toLocaleString() },
-        { title: '수행자', dataIndex: 'mberNm', key: 'mberNm', render: (text, record) => <span>{text || '비회원'} <Text type="secondary" style={{ fontSize: '11px' }}>({record.esntlId || '-'})</Text></span> },
-        { title: 'IP', dataIndex: 'conectIp', key: 'conectIp', width: 120 },
-        { title: 'Method', dataIndex: 'conectMethod', key: 'conectMethod', width: 90, render: (method) => <Tag color={method === 'POST' ? 'green' : method === 'DELETE' ? 'red' : 'blue'}>{method}</Tag> },
+        { title: 'No', dataIndex: 'logId', key: 'logId', width: 60, align: 'center', sorter: (a, b) => b.logId - a.logId },
+        { title: '일시', dataIndex: 'creatPnttm', key: 'creatPnttm', width: 140, align: 'center', render: (date) => new Date(date).toLocaleString() },
+        { title: '수행자', dataIndex: 'mberNm', key: 'mberNm', width: 90, align: 'center', render: (text, record) => <span>{text || '비회원'}</span> },
+        { title: 'IP', dataIndex: 'conectIp', key: 'conectIp', width: 110, align: 'center' },
+        { title: 'Method', dataIndex: 'conectMethod', key: 'conectMethod', width: 80, align: 'center', render: (method) => <Tag color={method === 'POST' ? 'green' : method === 'DELETE' ? 'red' : 'blue'}>{method}</Tag> },
         { title: 'URL', dataIndex: 'conectUrl', key: 'conectUrl', ellipsis: true },
     ];
 
@@ -80,10 +80,10 @@ const AuditLogList = () => {
     };
 
     const auditColumns = [
-        { title: 'No', dataIndex: 'logId', width: 70, sorter: (a, b) => b.logId - a.logId },
-        { title: '일시', dataIndex: 'creatDt', width: 160, render: (date) => new Date(date).toLocaleString() },
+        { title: 'No', dataIndex: 'logId', width: 60, align: 'center', sorter: (a, b) => b.logId - a.logId },
+        { title: '일시', dataIndex: 'creatDt', width: 140, align: 'center', render: (date) => new Date(date).toLocaleString() },
         {
-            title: '행위', dataIndex: 'actionTy', width: 90, render: (val) => {
+            title: '행위', dataIndex: 'actionTy', width: 80, align: 'center', render: (val) => {
                 let color = 'blue';
                 if (val === 'INSERT') color = 'green';
                 if (val === 'UPDATE') color = 'orange';
@@ -91,10 +91,10 @@ const AuditLogList = () => {
                 return <Tag color={color}>{val}</Tag>;
             }
         },
-        { title: '대상 메뉴', dataIndex: 'menuId', width: 120 },
+        { title: '대상 메뉴', dataIndex: 'menuId', width: 100, align: 'center' },
         { title: '대상 데이터', dataIndex: 'targetNm', ellipsis: true, render: (text, record) => <span>{text} <Text type="secondary" style={{ fontSize: '11px' }}>({record.targetId})</Text></span> },
-        { title: '수행자', dataIndex: 'userNm', width: 100, render: (text, record) => <span>{text}<br /><Text type="secondary" style={{ fontSize: '10px' }}>{record.clientIp}</Text></span> },
-        { title: '보기', width: 70, align: 'center', render: (_, record) => <Button size="small" icon={<EyeOutlined />} onClick={() => showAuditDetail(record)} /> },
+        { title: '수행자', dataIndex: 'userNm', width: 90, align: 'center', render: (text, record) => <span>{text}</span> },
+        { title: '보기', width: 60, align: 'center', render: (_, record) => <Button size="small" icon={<EyeOutlined />} onClick={() => showAuditDetail(record)} /> },
     ];
 
     return (
@@ -127,6 +127,7 @@ const AuditLogList = () => {
                             loading={auditLoading}
                             pagination={{ pageSize: 15 }}
                             size="small"
+                            style={{ tableLayout: 'fixed' }}
                         />
                     </TabPane>
 
@@ -149,6 +150,7 @@ const AuditLogList = () => {
                             loading={accessLoading}
                             pagination={{ pageSize: 15 }}
                             size="small"
+                            style={{ tableLayout: 'fixed' }}
                         />
                     </TabPane>
                 </Tabs>

@@ -64,6 +64,7 @@ const MainLayout = () => {
             label: '사이트 관리',
             children: [
                 { key: '/menu', label: '메뉴 관리' },
+                { key: '/category', label: '카테고리 관리' },
                 { key: '/widget', label: '위젯 관리' },
                 { key: '/template', label: '템플릿 관리' },
             ]

@@ -82,12 +82,12 @@ const WorkflowDashboard = () => {
         {
             title: '요청 ID',
             dataIndex: 'reqId',
-            width: 150,
+            width: 120,
         },
         {
             title: '구분',
             dataIndex: 'targetType',
-            width: 100,
+            width: 90,
             render: (text) => <Tag color="blue">{text}</Tag>,
         },
         {
@@ -98,20 +98,20 @@ const WorkflowDashboard = () => {
         {
             title: '요청자',
             dataIndex: 'reqUserNm',
-            width: 100,
+            width: 90,
             align: 'center',
         },
         {
             title: '요청일시',
             dataIndex: 'reqDt',
-            width: 160,
+            width: 140,
             align: 'center',
             render: (date) => new Date(date).toLocaleString(),
         },
         {
             title: '상태',
             dataIndex: 'status',
-            width: 100,
+            width: 90,
             align: 'center',
             render: (status) => {
                 let color = 'default';
@@ -128,13 +128,13 @@ const WorkflowDashboard = () => {
             {
                 title: '처리자',
                 dataIndex: 'processUserNm',
-                width: 100,
+                width: 90,
                 align: 'center',
             },
             {
                 title: '처리일시',
                 dataIndex: 'processDt',
-                width: 160,
+                width: 140,
                 align: 'center',
                 render: (date) => date ? new Date(date).toLocaleString() : '-',
             }
@@ -143,10 +143,10 @@ const WorkflowDashboard = () => {
         columns.push({
             title: '관리',
             key: 'action',
-            width: 180,
+            width: 150,
             align: 'center',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button
                         type="primary"
                         size="small"
@@ -192,6 +192,8 @@ const WorkflowDashboard = () => {
                     rowKey="reqId"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
 

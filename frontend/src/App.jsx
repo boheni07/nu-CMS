@@ -11,6 +11,7 @@ import ContentForm from './pages/ContentForm';
 import MenuList from './pages/MenuList';
 import MenuForm from './pages/MenuForm';
 import WidgetManagement from './pages/WidgetManagement';
+import CategoryManagement from './pages/CategoryManagement';
 import SitePreview from './pages/SitePreview';
 import TemplateList from './pages/TemplateList';
 import TemplateForm from './pages/TemplateForm';
@@ -18,6 +19,7 @@ import MemberManagement from './pages/MemberManagement';
 import RoleManagement from './pages/RoleManagement';
 import BoardManagementPage from './pages/BoardManagement';
 import ArticleList from './pages/ArticleList';
+import ArticleDetail from './pages/ArticleDetail';
 import ArticleForm from './pages/ArticleForm';
 import SystemConfig from './pages/SystemConfig';
 import AuditLogList from './pages/AuditLogList';
@@ -80,6 +82,7 @@ function App() {
             <Route path="menu" element={<MenuList />} />
             <Route path="menu/new" element={<MenuForm />} />
             <Route path="menu/edit/:id" element={<MenuForm />} />
+            <Route path="category" element={<CategoryManagement />} />
             <Route path="widget" element={<WidgetManagement />} />
             <Route path="preview" element={<SitePreview />} />
             <Route path="template" element={<TemplateList />} />
@@ -90,6 +93,7 @@ function App() {
             <Route path="board-master" element={<BoardManagementPage />} />
             <Route path="board/:bbsId/articles" element={<ArticleList />} />
             <Route path="board/:bbsId/articles/new" element={<ArticleForm />} />
+            <Route path="board/:bbsId/articles/:nttId" element={<ArticleDetail />} />
             <Route path="board/:bbsId/articles/:nttId/edit" element={<ArticleForm />} />
             <Route path="config" element={<SystemConfig />} />
             <Route path="audit-log" element={<AuditLogList />} />

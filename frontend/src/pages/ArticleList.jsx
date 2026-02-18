@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Space, Input, Tag, message, Breadcrumb, Popconfirm } from 'antd';
+import { Table, Card, Button, Space, Input, Tag, message, Breadcrumb, Popconfirm, Modal, Spin } from 'antd';
 import { FormOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import CmsService from '../api/services/cms';
@@ -12,6 +12,10 @@ const ArticleList = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
 
+    const [previewVisible, setPreviewVisible] = useState(false);
+    const [previewArticle, setPreviewArticle] = useState(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
+
     useEffect(() => {
         fetchList();
     }, [bbsId, pagination.current]);
@@ -19,15 +23,11 @@ const ArticleList = () => {
     const fetchList = async () => {
         setLoading(true);
         try {
-            // 실제 API 호출 시 params를 전달하여 페이징 처리 가능
-            // 현재는 예시로 전체 목록을 가져온다고 가정하거나, 백엔드 스펙에 맞게 조정 필요
             const response = await CmsService.board.article.getList(bbsId, {
                 pageIndex: pagination.current,
                 pageSize: pagination.pageSize
             });
 
-            // 응답 구조가 { list: [], pagination: {} } 인지, 단순히 배열인지 확인 필요
-            // 여기서는 안전하게 처리
             const dataList = Array.isArray(response) ? response : (response.list || []);
             const totalCount = response.totalCount || dataList.length;
 
@@ -40,28 +40,56 @@ const ArticleList = () => {
         }
     };
 
+    const handlePreview = async (nttId) => {
+        setPreviewVisible(true);
+        setPreviewLoading(true);
+        try {
+            const data = await CmsService.board.article.getDetail(bbsId, nttId);
+            setPreviewArticle(data);
+        } catch (error) {
+            message.error('게시물 정보를 불러오는데 실패했습니다.');
+            setPreviewVisible(false);
+        } finally {
+            setPreviewLoading(false);
+        }
+    };
+
     const handleDelete = async (nttId) => {
         try {
             await CmsService.board.article.delete(bbsId, nttId);
             message.success('게시물이 삭제되었습니다.');
             fetchList();
+            if (previewVisible && previewArticle?.nttId === nttId) {
+                setPreviewVisible(false);
+            }
         } catch (error) {
             message.error('삭제 실패: ' + (error.response?.data?.message || error.message));
         }
     };
 
     const columns = [
-        { title: 'No', dataIndex: 'nttId', key: 'nttId', width: 80, render: (val, _, index) => pagination.total - ((pagination.current - 1) * pagination.pageSize) - index },
-        { title: '제목', dataIndex: 'nttSj', key: 'nttSj', render: (text, record) => <a onClick={() => navigate(`/board/${bbsId}/articles/${record.nttId}`)}>{text}</a> },
-        { title: '작성자', dataIndex: 'frstRegisterId', key: 'frstRegisterId', width: 120 },
-        { title: '작성일', dataIndex: 'frstRegistPnttm', key: 'frstRegistPnttm', width: 150, render: (val) => val ? new Date(val).toLocaleDateString() : '-' },
-        { title: '조회수', dataIndex: 'inqireCo', key: 'inqireCo', width: 80, align: 'center' },
+        { title: 'No', dataIndex: 'nttId', key: 'nttId', width: 70, align: 'center', render: (val, _, index) => pagination.total - ((pagination.current - 1) * pagination.pageSize) - index },
+        {
+            title: '제목',
+            dataIndex: 'nttSj',
+            key: 'nttSj',
+            ellipsis: true,
+            render: (text, record) => (
+                <a onClick={() => handlePreview(record.nttId)} style={{ cursor: 'pointer' }}>
+                    {text}
+                </a>
+            )
+        },
+        { title: '작성자', dataIndex: 'frstRegisterId', key: 'frstRegisterId', width: 100, align: 'center' },
+        { title: '작성일', dataIndex: 'frstRegistPnttm', key: 'frstRegistPnttm', width: 120, align: 'center', render: (val) => val ? new Date(val).toLocaleDateString() : '-' },
+        { title: '조회수', dataIndex: 'inqireCo', key: 'inqireCo', width: 70, align: 'center' },
         {
             title: '관리',
             key: 'action',
-            width: 150,
+            width: 140,
+            align: 'center',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/board/${bbsId}/articles/${record.nttId}/edit`)}>수정</Button>
                     <Popconfirm title="삭제하시겠습니까?" onConfirm={() => handleDelete(record.nttId)}>
                         <Button size="small" danger icon={<DeleteOutlined />}>삭제</Button>
@@ -97,8 +125,48 @@ const ArticleList = () => {
                         ...pagination,
                         onChange: (page) => setPagination(prev => ({ ...prev, current: page }))
                     }}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
+
+            <Modal
+                title={previewArticle?.nttSj || '게시물 미리보기'}
+                open={previewVisible}
+                onCancel={() => setPreviewVisible(false)}
+                footer={[
+                    <Button key="edit" icon={<EditOutlined />} onClick={() => {
+                        setPreviewVisible(false);
+                        navigate(`/board/${bbsId}/articles/${previewArticle.nttId}/edit`);
+                    }}>
+                        수정
+                    </Button>,
+                    <Button key="close" onClick={() => setPreviewVisible(false)}>
+                        닫기
+                    </Button>
+                ]}
+                width={800}
+                centered
+            >
+                {previewLoading ? (
+                    <div style={{ textAlign: 'center', padding: '50px 0' }}><Spin /></div>
+                ) : (
+                    previewArticle && (
+                        <div>
+                            <div style={{ marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 10 }}>
+                                <Space split={<span style={{ color: '#ddd' }}>|</span>} style={{ fontSize: 13, color: '#666' }}>
+                                    <span>작성자: {previewArticle.frstRegisterId}</span>
+                                    <span>작성일: {new Date(previewArticle.frstRegistPnttm).toLocaleDateString()}</span>
+                                    <span>조회수: {previewArticle.inqireCo}</span>
+                                </Space>
+                            </div>
+                            <div style={{ minHeight: 200, whiteSpace: 'pre-wrap' }}>
+                                {previewArticle.nttCn}
+                            </div>
+                        </div>
+                    )
+                )}
+            </Modal>
         </div>
     );
 };

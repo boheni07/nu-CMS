@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Input, Select, Tag, Card, Breadcrumb, message, Modal, Timeline, Typography } from 'antd';
-import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, RollbackOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Table, Space, Button, Input, Select, Tag, Card, Breadcrumb, message, Modal, Timeline, Typography, Divider, Dropdown, Tooltip } from 'antd';
+import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, RollbackOutlined, FileTextOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import axios from '../api/axios';
@@ -16,6 +16,8 @@ const ContentList = () => {
     const [currentId, setCurrentId] = useState(null);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
     const [searchParams, setSearchParams] = useState({ sj: '', sttusCode: '' });
+    const [previewModalVisible, setPreviewModalVisible] = useState(false);
+    const [previewContent, setPreviewContent] = useState(null);
     const navigate = useNavigate();
 
     const fetchData = async (params = {}) => {
@@ -44,6 +46,11 @@ const ContentList = () => {
 
     const handleSearch = () => {
         fetchData({ current: 1 });
+    };
+
+    const handlePreview = (record) => {
+        setPreviewContent(record);
+        setPreviewModalVisible(true);
     };
 
     const showHistory = async (id) => {
@@ -84,19 +91,44 @@ const ContentList = () => {
         });
     };
 
+
+    const handleDelete = (cntentsId) => {
+        Modal.confirm({
+            title: '삭제 확인',
+            content: '정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+            okText: '삭제',
+            okType: 'danger',
+            cancelText: '취소',
+            onOk: async () => {
+                try {
+                    const response = await axios.delete(`/cms/content/${cntentsId}`);
+                    if (response.data.success) {
+                        message.success('삭제되었습니다.');
+                        fetchData(pagination);
+                    } else {
+                        message.error(response.data.message || '삭제에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    message.error('삭제 중 오류가 발생했습니다.');
+                }
+            },
+        });
+    };
+
     const columns = [
         {
             title: 'ID',
             dataIndex: 'cntentsId',
             key: 'cntentsId',
-            width: 120,
+            width: 90, // 100 -> 90
             align: 'center',
         },
         {
             title: '카테고리',
             dataIndex: 'ctgryId',
             key: 'ctgryId',
-            width: 120,
+            width: 90, // 100 -> 90
             align: 'center',
             render: (id) => <Tag>{id || '미지정'}</Tag>,
         },
@@ -104,20 +136,25 @@ const ContentList = () => {
             title: '제목',
             dataIndex: 'sj',
             key: 'sj',
-            ellipsis: true, // 제목은 나머지 공간을 차지하도록 width 미지정
+            ellipsis: true,
+            render: (text, record) => (
+                <a onClick={() => handlePreview(record)} style={{ cursor: 'pointer' }}>
+                    {text}
+                </a>
+            ),
         },
         {
             title: '작성자',
             dataIndex: 'wrterId',
             key: 'wrterId',
-            width: 100,
+            width: 80, // 90 -> 80
             align: 'center',
         },
         {
             title: '버전',
             dataIndex: 'verNo',
             key: 'verNo',
-            width: 80,
+            width: 60, // 70 -> 60
             align: 'center',
             render: (text) => `v${text}`,
         },
@@ -125,7 +162,7 @@ const ContentList = () => {
             title: '상태',
             dataIndex: 'sttusCode',
             key: 'sttusCode',
-            width: 100,
+            width: 80, // 90 -> 80
             align: 'center',
             render: (code) => {
                 const statusMap = {
@@ -143,20 +180,20 @@ const ContentList = () => {
             title: '수정일',
             dataIndex: 'lastUpdtPnttm',
             key: 'lastUpdtPnttm',
-            width: 160,
+            width: 130, // 140 -> 130
             align: 'center',
             render: (date) => dayjs(date).format('YYYY-MM-DD HH:mm'),
         },
         {
             title: '관리',
             key: 'action',
-            width: 220,
+            width: 190, // 200 -> 190
             align: 'center',
             render: (_, record) => (
                 <Space size="small">
                     <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/content/edit/${record.cntentsId}`)}>수정</Button>
                     <Button size="small" icon={<HistoryOutlined />} onClick={() => showHistory(record.cntentsId)}>이력</Button>
-                    <Button size="small" icon={<DeleteOutlined />} danger>삭제</Button>
+                    <Button size="small" icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.cntentsId)}>삭제</Button>
                 </Space>
             ),
         },
@@ -170,36 +207,39 @@ const ContentList = () => {
             </Breadcrumb>
 
             <Card style={{ marginBottom: 16 }}>
-                <Space wrap>
-                    <Input
-                        placeholder="제목 검색"
-                        style={{ width: 200 }}
-                        value={searchParams.sj}
-                        onChange={e => setSearchParams({ ...searchParams, sj: e.target.value })}
-                        onPressEnter={handleSearch}
-                    />
-                    <Select
-                        placeholder="상태 선택"
-                        style={{ width: 120 }}
-                        value={searchParams.sttusCode}
-                        onChange={value => setSearchParams({ ...searchParams, sttusCode: value })}
-                    >
-                        <Option value="">전체</Option>
-                        <Option value="I">임시</Option>
-                        <Option value="R">검토</Option>
-                        <Option value="A">승인</Option>
-                        <Option value="P">게시</Option>
-                        <Option value="D">종료</Option>
-                    </Select>
-                    <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-                        검색
+                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                    <Space>
+                        <Select
+                            placeholder="상태 선택"
+                            style={{ width: 120 }}
+                            value={searchParams.sttusCode}
+                            onChange={value => setSearchParams({ ...searchParams, sttusCode: value })}
+                        >
+                            <Option value="">전체 상태</Option>
+                            <Option value="I">임시</Option>
+                            <Option value="R">검토</Option>
+                            <Option value="A">승인</Option>
+                            <Option value="P">게시</Option>
+                            <Option value="D">종료</Option>
+                        </Select>
+                        <Input.Search
+                            placeholder="제목 검색"
+                            style={{ width: 300 }}
+                            value={searchParams.sj}
+                            onChange={e => setSearchParams({ ...searchParams, sj: e.target.value })}
+                            onSearch={handleSearch}
+                            enterButton
+                        />
+                    </Space>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/content/new')}>
+                        신규 등록
                     </Button>
                 </Space>
             </Card>
 
             <Card
                 title={<span><FileTextOutlined /> 콘텐츠 목록</span>}
-                extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/content/new')}>신규 등록</Button>}
+                bodyStyle={{ padding: 0 }} // 테이블 카드 패딩 제거로 깔끔하게
             >
                 <Table
                     columns={columns}
@@ -208,7 +248,8 @@ const ContentList = () => {
                     loading={loading}
                     pagination={pagination}
                     onChange={(p) => setPagination(p)}
-                    size="middle"
+                    size="small"
+                    style={{ tableLayout: 'fixed' }} // 테이블 레이아웃 고정으로 가로 폭 준수
                 />
             </Card>
 
@@ -243,6 +284,32 @@ const ContentList = () => {
                         ),
                     })) : [{ children: '저장된 이력이 없습니다.' }]}
                 />
+            </Modal>
+
+            <Modal
+                title="콘텐츠 미리보기"
+                open={previewModalVisible}
+                onCancel={() => setPreviewModalVisible(false)}
+                footer={null}
+                width={800}
+            >
+                {previewContent && (
+                    <div>
+                        <Typography.Title level={4}>{previewContent.sj}</Typography.Title>
+                        <Space style={{ marginBottom: 16 }}>
+                            <Tag color="blue">{previewContent.ctgryId || '미지정'}</Tag>
+                            <Text type="secondary">작성자: {previewContent.wrterId}</Text>
+                            <Text type="secondary">|</Text>
+                            <Text type="secondary">수정일: {dayjs(previewContent.lastUpdtPnttm).format('YYYY-MM-DD HH:mm')}</Text>
+                        </Space>
+                        <Divider />
+                        <div
+                            className="preview-content"
+                            dangerouslySetInnerHTML={{ __html: previewContent.cn }}
+                            style={{ minHeight: '200px', padding: '10px', border: '1px solid #f0f0f0', borderRadius: '4px' }}
+                        />
+                    </div>
+                )}
             </Modal>
         </div>
     );

@@ -45,7 +45,7 @@ const TemplateList = () => {
             title: '템플릿 ID',
             dataIndex: 'tmplatId',
             key: 'tmplatId',
-            width: 150,
+            width: 120,
             align: 'center',
         },
         {
@@ -58,7 +58,7 @@ const TemplateList = () => {
             title: '구분',
             dataIndex: 'tmplatSeCode',
             key: 'tmplatSeCode',
-            width: 120,
+            width: 100,
             align: 'center',
             render: (text) => <Tag color="blue">{text}</Tag>
         },
@@ -72,17 +72,17 @@ const TemplateList = () => {
             title: '사용여부',
             dataIndex: 'useAt',
             key: 'useAt',
-            width: 100,
+            width: 80,
             align: 'center',
             render: (text) => <Tag color={text === 'Y' ? 'green' : 'red'}>{text === 'Y' ? '사용' : '미사용'}</Tag>
         },
         {
             title: '관리',
             key: 'action',
-            width: 180,
+            width: 150,
             align: 'center',
             render: (_, record) => (
-                <Space size="middle">
+                <Space size="small">
                     <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/template/edit/${record.tmplatId}`)}>수정</Button>
                     <Button size="small" icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.tmplatId)}>삭제</Button>
                 </Space>
@@ -110,6 +110,8 @@ const TemplateList = () => {
                     rowKey="tmplatId"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    size="small"
+                    style={{ tableLayout: 'fixed' }}
                 />
             </Card>
         </div>
