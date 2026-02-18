@@ -2,6 +2,9 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import MainLayout from './layouts/MainLayout';
+import PublicLayout from './layouts/PublicLayout';
+import PublicHome from './pages/PublicHome';
+import PublicBoardList from './pages/PublicBoardList';
 import Dashboard from './pages/Dashboard';
 import ContentList from './pages/ContentList';
 import ContentForm from './pages/ContentForm';
@@ -61,6 +64,13 @@ function App() {
       <BrowserRouter>
         <PvLogger />
         <Routes>
+          {/* Public Routes */}
+          <Route path="/view" element={<PublicLayout />}>
+            <Route index element={<PublicHome />} />
+            <Route path="board" element={<PublicBoardList />} />
+          </Route>
+
+          {/* Admin Routes */}
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />

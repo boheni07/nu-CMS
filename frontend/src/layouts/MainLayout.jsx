@@ -125,7 +125,7 @@ const MainLayout = () => {
                         style: { fontSize: '18px', cursor: 'pointer' }
                     })}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Button type="link" icon={<GlobalOutlined />} onClick={() => window.open('http://localhost:8080', '_blank')}>
+                        <Button type="link" icon={<GlobalOutlined />} onClick={() => window.open('/view', '_blank')}>
                             사이트 바로가기
                         </Button>
                         <Dropdown overlay={userMenu}>

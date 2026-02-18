@@ -60,7 +60,7 @@ const SitePreview = () => {
                 }}>
                     <iframe
                         key={refreshKey}
-                        src="/"
+                        src="/view"
                         title="Site Preview"
                         style={{ width: '100%', height: '100%', border: 'none' }}
                     />
