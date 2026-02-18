@@ -11,7 +11,10 @@ import {
     LayoutOutlined,
     UserOutlined,
     TeamOutlined,
-    ContainerOutlined
+    ContainerOutlined,
+    SafetyCertificateOutlined,
+    PictureOutlined,
+    BarChartOutlined
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
@@ -46,6 +49,16 @@ const MainLayout = () => {
             ]
         },
         {
+            key: '/media',
+            icon: <PictureOutlined />,
+            label: '미디어 라이브러리',
+        },
+        {
+            key: '/stats',
+            icon: <BarChartOutlined />,
+            label: '통계 대시보드',
+        },
+        {
             key: 'site-management',
             icon: <GlobalOutlined />,
             label: '사이트 관리',
@@ -63,6 +76,11 @@ const MainLayout = () => {
                 { key: '/member', label: '회원 관리' },
                 { key: '/role', label: '권한/역할 관리' },
             ]
+        },
+        {
+            key: '/workflow',
+            icon: <SafetyCertificateOutlined />,
+            label: '승인 워크플로우',
         },
         {
             key: 'system-config',

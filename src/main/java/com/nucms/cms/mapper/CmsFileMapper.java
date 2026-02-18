@@ -1,6 +1,7 @@
 package com.nucms.cms.mapper;
 
 import com.nucms.cms.model.CmsFileVO;
+import com.nucms.cms.model.CmsMediaFolderVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -31,4 +32,11 @@ public interface CmsFileMapper {
 
     /** 미디어 라이브러리 목록 조희 (전체 이미지/미디어 대상) */
     List<CmsFileVO> selectMediaLibraryList(CmsFileVO vo);
+
+    /* 미디어 폴더 관리 */
+    void insertMediaFolder(CmsMediaFolderVO vo);
+    void updateMediaFolder(CmsMediaFolderVO vo);
+    void deleteMediaFolder(String folderId);
+    List<CmsMediaFolderVO> selectMediaFolderList(CmsMediaFolderVO vo);
+    CmsMediaFolderVO selectMediaFolder(String folderId);
 }

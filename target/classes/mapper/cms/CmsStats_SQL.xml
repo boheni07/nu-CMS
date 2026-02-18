@@ -2,46 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nucms.cms.mapper.CmsStatsMapper">
 
-    <insert id="insertPvLog" parameterType="com.nucms.cms.model.CmsStatsVO">
+    <insert id="insertPv" parameterType="com.nucms.cms.model.CmsStatsVO">
         INSERT INTO CMS_STATS_PV (
             CONECT_URL, ESNTL_ID, CONECT_IP, REFERER_URL, CONECT_DE
         ) VALUES (
-            #{conectUrl}, #{esntlId}, #{conectIp}, #{refererUrl}, #{conectDe}
+            #{conectUrl}, #{esntlId}, #{conectIp}, #{refererUrl}, DATE_FORMAT(NOW(), '%Y%m%d')
         )
     </insert>
 
-    <select id="selectDailyPvStats" parameterType="map" resultType="com.nucms.cms.model.CmsStatsVO">
-        SELECT
-            CONECT_DE AS statsLabel,
-            COUNT(*) AS statsCount
+    <!-- 일별 통계 (최근 N일) -->
+    <select id="selectDailyStats" parameterType="com.nucms.cms.model.CmsStatsVO" resultType="com.nucms.cms.model.CmsStatsVO">
+        SELECT 
+            CONECT_DE AS conectDe,
+            COUNT(*) AS pvCount,
+            COUNT(DISTINCT CONECT_IP) AS userCount
         FROM CMS_STATS_PV
         WHERE CONECT_DE BETWEEN #{startDate} AND #{endDate}
         GROUP BY CONECT_DE
         ORDER BY CONECT_DE ASC
     </select>
 
-    <select id="selectPopularContentStats" parameterType="int" resultType="com.nucms.cms.model.CmsStatsVO">
-        SELECT
-            CONECT_URL AS statsLabel,
-            COUNT(*) AS statsCount
+    <!-- 메뉴별 통계 (인기 메뉴) -->
+    <select id="selectMenuStats" parameterType="com.nucms.cms.model.CmsStatsVO" resultType="com.nucms.cms.model.CmsStatsVO">
+        SELECT 
+            CONECT_URL AS conectUrl,
+            COUNT(*) AS pvCount
         FROM CMS_STATS_PV
+        WHERE CONECT_DE BETWEEN #{startDate} AND #{endDate}
         GROUP BY CONECT_URL
-        ORDER BY statsCount DESC
-        LIMIT #{limit}
-    </select>
-
-    <select id="selectRefererStats" resultType="com.nucms.cms.model.CmsStatsVO">
-        SELECT
-            CASE 
-                WHEN REFERER_URL IS NULL OR REFERER_URL = '' THEN 'Direct'
-                WHEN REFERER_URL LIKE '%google%' THEN 'Google'
-                WHEN REFERER_URL LIKE '%naver%' THEN 'Naver'
-                ELSE 'Other'
-            END AS statsLabel,
-            COUNT(*) AS statsCount
-        FROM CMS_STATS_PV
-        GROUP BY statsLabel
-        ORDER BY statsCount DESC
+        ORDER BY pvCount DESC
+        LIMIT 10
     </select>
 
 </mapper>

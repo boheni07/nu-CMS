@@ -50,4 +50,18 @@ public class CmsFileVO implements Serializable {
 
     /** 삭제용 SN 리스트 */
     private int[] fileSns;
+
+    /* DAM 확장 필드 */
+    /** 이미지 너비 */
+    private int fileWidth;
+    /** 이미지 높이 */
+    private int fileHeight;
+    /** MIME 타입 */
+    private String fileTy;
+    /** 작성자/소유자 */
+    private String author;
+    /** 태그 (콤마 구분) */
+    private String tags;
+    /** 소속 폴더 ID */
+    private String folderId;
 }

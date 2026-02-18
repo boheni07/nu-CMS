@@ -13,10 +13,12 @@
     <insert id="insertFileDetail" parameterType="com.nucms.cms.model.CmsFileVO">
         INSERT INTO CMS_FILE_DETAIL (
             ATCH_FILE_ID, FILE_SN, FILE_STRE_COURS, STRE_FILE_NM,
-            ORIGNL_FILE_NM, FILE_EXTSN, FILE_CN, FILE_SIZE, THUMB_AT
+            ORIGNL_FILE_NM, FILE_EXTSN, FILE_CN, FILE_SIZE, THUMB_AT,
+            FILE_WIDTH, FILE_HEIGHT, FILE_TY, AUTHOR, TAGS, FOLDER_ID
         ) VALUES (
             #{atchFileId}, #{fileSn}, #{fileStreCours}, #{streFileNm},
-            #{orignlFileNm}, #{fileExtsn}, #{fileCn}, #{fileSize}, #{thumbAt}
+            #{orignlFileNm}, #{fileExtsn}, #{fileCn}, #{fileSize}, #{thumbAt},
+            #{fileWidth}, #{fileHeight}, #{fileTy}, #{author}, #{tags}, #{folderId}
         )
     </insert>
 
@@ -29,7 +31,11 @@
             FILE_EXTSN AS fileExtsn,
             FILE_SIZE AS fileSize,
             THUMB_AT AS thumbAt,
-            FRST_REGIST_PNTTM AS frstRegistPnttm
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            FILE_WIDTH AS fileWidth,
+            FILE_HEIGHT AS fileHeight,
+            FILE_TY AS fileTy,
+            FOLDER_ID AS folderId
         FROM CMS_FILE_DETAIL
         WHERE ATCH_FILE_ID = #{atchFileId}
         ORDER BY FILE_SN ASC
@@ -44,7 +50,13 @@
             ORIGNL_FILE_NM AS orignlFileNm,
             FILE_EXTSN AS fileExtsn,
             FILE_SIZE AS fileSize,
-            THUMB_AT AS thumbAt
+            THUMB_AT AS thumbAt,
+            FILE_WIDTH AS fileWidth,
+            FILE_HEIGHT AS fileHeight,
+            FILE_TY AS fileTy,
+            AUTHOR AS author,
+            TAGS AS tags,
+            FOLDER_ID AS folderId
         FROM CMS_FILE_DETAIL
         WHERE ATCH_FILE_ID = #{atchFileId}
           AND FILE_SN = #{fileSn}
@@ -75,11 +87,21 @@
             FILE_EXTSN AS fileExtsn,
             FILE_SIZE AS fileSize,
             THUMB_AT AS thumbAt,
-            FRST_REGIST_PNTTM AS frstRegistPnttm
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            FILE_WIDTH AS fileWidth,
+            FILE_HEIGHT AS fileHeight,
+            TAGS AS tags,
+            FOLDER_ID AS folderId
         FROM CMS_FILE_DETAIL
         <where>
+            <if test="folderId != null and folderId != ''">
+                AND FOLDER_ID = #{folderId}
+            </if>
             <if test="orignlFileNm != null and orignlFileNm != ''">
                 AND ORIGNL_FILE_NM LIKE CONCAT('%', #{orignlFileNm}, '%')
+            </if>
+            <if test="tags != null and tags != ''">
+                AND TAGS LIKE CONCAT('%', #{tags}, '%')
             </if>
             <if test="fileExtsn != null and fileExtsn != ''">
                 AND FILE_EXTSN = #{fileExtsn}
@@ -88,6 +110,50 @@
             AND THUMB_AT = 'N'
         </where>
         ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+    <!-- 미디어 폴더 관리 -->
+    <insert id="insertMediaFolder" parameterType="com.nucms.cms.model.CmsMediaFolderVO">
+        INSERT INTO CMS_MEDIA_FOLDER (
+            FOLDER_ID, UPPER_FOLDER_ID, FOLDER_NM, USE_AT
+        ) VALUES (
+            #{folderId}, #{upperFolderId}, #{folderNm}, 'Y'
+        )
+    </insert>
+
+    <update id="updateMediaFolder" parameterType="com.nucms.cms.model.CmsMediaFolderVO">
+        UPDATE CMS_MEDIA_FOLDER
+        SET FOLDER_NM = #{folderNm},
+            UPPER_FOLDER_ID = #{upperFolderId}
+        WHERE FOLDER_ID = #{folderId}
+    </update>
+
+    <delete id="deleteMediaFolder" parameterType="String">
+        DELETE FROM CMS_MEDIA_FOLDER
+        WHERE FOLDER_ID = #{folderId}
+    </delete>
+
+    <select id="selectMediaFolderList" parameterType="com.nucms.cms.model.CmsMediaFolderVO" resultType="com.nucms.cms.model.CmsMediaFolderVO">
+        SELECT
+            FOLDER_ID AS folderId,
+            UPPER_FOLDER_ID AS upperFolderId,
+            FOLDER_NM AS folderNm,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_MEDIA_FOLDER
+        WHERE USE_AT = 'Y'
+        ORDER BY FOLDER_NM ASC
+    </select>
+    
+    <select id="selectMediaFolder" parameterType="String" resultType="com.nucms.cms.model.CmsMediaFolderVO">
+        SELECT
+            FOLDER_ID AS folderId,
+            UPPER_FOLDER_ID AS upperFolderId,
+            FOLDER_NM AS folderNm,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_MEDIA_FOLDER
+        WHERE FOLDER_ID = #{folderId}
     </select>
 
 </mapper>

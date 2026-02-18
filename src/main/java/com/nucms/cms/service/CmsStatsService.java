@@ -2,16 +2,15 @@ package com.nucms.cms.service;
 
 import com.nucms.cms.model.CmsStatsVO;
 import java.util.List;
-import java.util.Map;
 
-/**
- * CMS 통계 관리 서비스 인터페이스
- */
 public interface CmsStatsService {
+    
+    /** PV 로그 기록 */
+    void logPv(String url, String ip, String referer, String userId);
 
-    /** 로그 기록 (PV) */
-    void addPvLog(CmsStatsVO vo);
+    /** 일별 통계 조회 */
+    List<CmsStatsVO> getDailyStats(String startDate, String endDate);
 
-    /** 요약 통계 조회 (PV 추이, 인기 콘텐츠, 유입경로) */
-    Map<String, Object> getSummaryStats(String startDate, String endDate);
+    /** 메뉴별 통계 조회 */
+    List<CmsStatsVO> getMenuStats(String startDate, String endDate);
 }

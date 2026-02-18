@@ -1,0 +1,32 @@
+* Host localhost:8080 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:8080...
+* Established connection to localhost (::1 port 8080) from ::1 port 51113 
+* using HTTP/1.x
+> POST /api/cms/dam/upload HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/8.16.0
+> Accept: */*
+> Content-Length: 239
+> Content-Type: multipart/form-data; boundary=------------------------yli2AjFlBQutE5LHnsK6Lu
+> 
+} [239 bytes data]
+* upload completely sent off: 239 bytes
+< HTTP/1.1 200 
+< Vary: Origin
+< Vary: Access-Control-Request-Method
+< Vary: Access-Control-Request-Headers
+< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+< Pragma: no-cache
+< Expires: 0
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Wed, 18 Feb 2026 05:13:48 GMT
+< 
+{ [130 bytes data]
+100   363    0   124  100   239   2960   5705 --:--:-- --:--:-- --:--:--  8853
+* Connection #0 to host localhost:8080 left intact
+{"success":true,"message":"요청이 성공적으로 처리되었습니다.","data":"FILE_CB54DF70-59EC-4","errorCode":null}

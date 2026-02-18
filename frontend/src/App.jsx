@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
@@ -18,6 +18,34 @@ import ArticleList from './pages/ArticleList';
 import ArticleForm from './pages/ArticleForm';
 import SystemConfig from './pages/SystemConfig';
 import AuditLogList from './pages/AuditLogList';
+import WorkflowDashboard from './pages/WorkflowDashboard';
+import MediaLibrary from './pages/MediaLibrary';
+import StatsDashboard from './pages/StatsDashboard';
+
+
+// PV Logger Component
+const PvLogger = () => {
+  const location = useLocation();
+  const [axiosInstance] = React.useState(() => import('./api/axios').then(m => m.default));
+
+  React.useEffect(() => {
+    // PV 기록 API 호출
+    const logPv = async () => {
+      try {
+        const axios = await axiosInstance;
+        await axios.post('/cms/stats/pv', {
+          url: location.pathname,
+          referer: document.referrer
+        });
+      } catch (e) {
+        // Ignore errors
+      }
+    };
+    logPv();
+  }, [location, axiosInstance]);
+
+  return null;
+};
 
 function App() {
   console.log('App.jsx: Safe Mode (Dashboard & ContentList Only)');
@@ -31,6 +59,7 @@ function App() {
       }}
     >
       <BrowserRouter>
+        <PvLogger />
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />
@@ -54,9 +83,10 @@ function App() {
             <Route path="board/:bbsId/articles/:nttId/edit" element={<ArticleForm />} />
             <Route path="config" element={<SystemConfig />} />
             <Route path="audit-log" element={<AuditLogList />} />
-            {/* 
+            <Route path="workflow" element={<WorkflowDashboard />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="stats" element={<StatsDashboard />} />
+            {/* 
             <Route path="search" element={<GlobalSearch />} />
             <Route path="settings" element={<UserSettings />} /> 
             */}

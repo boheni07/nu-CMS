@@ -1,64 +1,93 @@
 package com.nucms.cms.service.impl;
 
-import com.nucms.cms.mapper.CmsContentMapper;
-import com.nucms.cms.mapper.CmsWorkflowLogMapper;
-import com.nucms.cms.model.CmsContentVO;
+import com.nucms.cms.mapper.CmsWorkflowMapper;
+import com.nucms.cms.model.CmsWorkflowHistoryVO;
+import com.nucms.cms.model.CmsWorkflowRequestVO;
 import com.nucms.cms.service.CmsWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
 
-/**
- * CMS 워크플로우 서비스 구현 클래스
- */
 @Service
 @RequiredArgsConstructor
 public class CmsWorkflowServiceImpl implements CmsWorkflowService {
 
-    private final CmsContentMapper contentMapper;
-    private final CmsWorkflowLogMapper workflowLogMapper;
+    private final CmsWorkflowMapper workflowMapper;
 
     @Override
     @Transactional
-    public void changeStatus(String cntentsId, String nextStatus, String procrId, String comment) throws Exception {
-        CmsContentVO content = contentMapper.selectCmsContent(cntentsId);
-        if (content == null) {
-            throw new Exception("콘텐츠를 찾을 수 없습니다: " + cntentsId);
-        }
-
-        String preStatus = content.getSttusCode();
+    public void requestApproval(CmsWorkflowRequestVO vo) {
+        // ID 생성
+        String reqId = "WFRQ_" + UUID.randomUUID().toString().substring(0, 15).toUpperCase();
+        vo.setReqId(reqId);
         
-        // 상태 변경
-        content.setSttusCode(nextStatus);
-        contentMapper.updateCmsContent(content);
-
-        // 로그 기록
-        Map<String, Object> logParam = new HashMap<>();
-        logParam.put("cntentsId", cntentsId);
-        logParam.put("preStatusCode", preStatus);
-        logParam.put("aftStatusCode", nextStatus);
-        logParam.put("procrId", procrId);
-        logParam.put("processCn", comment);
-        workflowLogMapper.insertWorkflowLog(logParam);
+        // 요청 등록
+        workflowMapper.insertWorkflowRequest(vo);
+        
+        // 이력 기록 (REQUEST)
+        CmsWorkflowHistoryVO hist = new CmsWorkflowHistoryVO();
+        hist.setReqId(reqId);
+        hist.setActionCode("REQUEST");
+        hist.setActorId(vo.getReqUserId());
+        hist.setActionMsg(vo.getReqCn());
+        workflowMapper.insertWorkflowHistory(hist);
     }
 
     @Override
-    public void requestApproval(String cntentsId, String procrId) throws Exception {
-        changeStatus(cntentsId, "R", procrId, "승인 요청");
+    @Transactional
+    public void approveRequest(String reqId, String processUserId, String comment) {
+        // 상태 업데이트
+        CmsWorkflowRequestVO vo = new CmsWorkflowRequestVO();
+        vo.setReqId(reqId);
+        vo.setStatus("APPROVED");
+        vo.setProcessUserId(processUserId);
+        workflowMapper.updateWorkflowRequestStatus(vo);
+
+        // 이력 기록 (APPROVE)
+        CmsWorkflowHistoryVO hist = new CmsWorkflowHistoryVO();
+        hist.setReqId(reqId);
+        hist.setActionCode("APPROVE");
+        hist.setActorId(processUserId);
+        hist.setActionMsg(comment);
+        workflowMapper.insertWorkflowHistory(hist);
+        
+        // TODO: 실제 데이터 반영 로직 (Callback or Event Publisher needed for full implementation)
     }
 
     @Override
-    public void approve(String cntentsId, String procrId, String comment) throws Exception {
-        // 승인 시 게시(P) 상태로 변경 (또는 별도 승인 상태 A 후 스케줄러가 P로 변경)
-        // 여기서는 즉시 게시 가능한 상태인 'A'(승인)로 변경하거나 'P'(게시)로 변경
-        changeStatus(cntentsId, "A", procrId, comment);
+    @Transactional
+    public void rejectRequest(String reqId, String processUserId, String comment) {
+        // 상태 업데이트
+        CmsWorkflowRequestVO vo = new CmsWorkflowRequestVO();
+        vo.setReqId(reqId);
+        vo.setStatus("REJECTED");
+        vo.setProcessUserId(processUserId);
+        workflowMapper.updateWorkflowRequestStatus(vo);
+
+        // 이력 기록 (REJECT)
+        CmsWorkflowHistoryVO hist = new CmsWorkflowHistoryVO();
+        hist.setReqId(reqId);
+        hist.setActionCode("REJECT");
+        hist.setActorId(processUserId);
+        hist.setActionMsg(comment);
+        workflowMapper.insertWorkflowHistory(hist);
     }
 
     @Override
-    public void reject(String cntentsId, String procrId, String comment) throws Exception {
-        changeStatus(cntentsId, "I", procrId, "반려: " + comment);
+    public List<CmsWorkflowRequestVO> getRequestList(CmsWorkflowRequestVO vo) {
+        return workflowMapper.selectWorkflowRequestList(vo);
+    }
+
+    @Override
+    public CmsWorkflowRequestVO getRequestDetail(String reqId) {
+        return workflowMapper.selectWorkflowRequest(reqId);
+    }
+
+    @Override
+    public List<CmsWorkflowHistoryVO> getHistoryList(String reqId) {
+        return workflowMapper.selectWorkflowHistoryList(reqId);
     }
 }

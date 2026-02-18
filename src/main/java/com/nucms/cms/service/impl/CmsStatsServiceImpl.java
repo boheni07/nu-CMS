@@ -5,14 +5,12 @@ import com.nucms.cms.model.CmsStatsVO;
 import com.nucms.cms.service.CmsStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
-/**
- * CMS 통계 관리 서비스 구현체
- */
 @Service
 @RequiredArgsConstructor
 public class CmsStatsServiceImpl implements CmsStatsService {
@@ -20,30 +18,29 @@ public class CmsStatsServiceImpl implements CmsStatsService {
     private final CmsStatsMapper statsMapper;
 
     @Override
-    public void addPvLog(CmsStatsVO vo) {
-        if (vo.getConectDe() == null) {
-            vo.setConectDe(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
-        }
-        statsMapper.insertPvLog(vo);
+    @Transactional
+    public void logPv(String url, String ip, String referer, String userId) {
+        CmsStatsVO vo = new CmsStatsVO();
+        vo.setConectUrl(url);
+        vo.setConectIp(ip);
+        vo.setRefererUrl(referer);
+        vo.setEsntlId(userId);
+        statsMapper.insertPv(vo);
     }
 
     @Override
-    public Map<String, Object> getSummaryStats(String startDate, String endDate) {
-        Map<String, Object> result = new HashMap<>();
-        
-        Map<String, Object> param = new HashMap<>();
-        param.put("startDate", startDate);
-        param.put("endDate", endDate);
+    public List<CmsStatsVO> getDailyStats(String startDate, String endDate) {
+        CmsStatsVO vo = new CmsStatsVO();
+        vo.setStartDate(startDate != null ? startDate : LocalDate.now().minusDays(30).format(DateTimeFormatter.BASIC_ISO_DATE));
+        vo.setEndDate(endDate != null ? endDate : LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+        return statsMapper.selectDailyStats(vo);
+    }
 
-        // 1. 일별 PV 추이
-        result.put("dailyPv", statsMapper.selectDailyPvStats(param));
-        
-        // 2. 인기 콘텐츠 (URL 기준)
-        result.put("popularContent", statsMapper.selectPopularContentStats(10));
-        
-        // 3. 유입경로 비중
-        result.put("refererStats", statsMapper.selectRefererStats());
-
-        return result;
+    @Override
+    public List<CmsStatsVO> getMenuStats(String startDate, String endDate) {
+        CmsStatsVO vo = new CmsStatsVO();
+        vo.setStartDate(startDate != null ? startDate : LocalDate.now().minusDays(30).format(DateTimeFormatter.BASIC_ISO_DATE));
+        vo.setEndDate(endDate != null ? endDate : LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+        return statsMapper.selectMenuStats(vo);
     }
 }

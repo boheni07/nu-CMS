@@ -137,11 +137,120 @@ public class CmsFileServiceImpl implements CmsFileService {
     }
 
     @Override
+    @Transactional
+    public String uploadFileWithMetadata(MultipartFile file, CmsFileVO metaVO) throws Exception {
+        if (file == null || file.isEmpty()) return null;
+
+        String atchFileId = metaVO.getAtchFileId();
+        // 1. ATCH_FILE_ID 생성 (없을 경우)
+        if (atchFileId == null || atchFileId.isEmpty()) {
+            atchFileId = "FILE_" + UUID.randomUUID().toString().substring(0, 15).toUpperCase();
+            CmsFileVO groupVO = new CmsFileVO();
+            groupVO.setAtchFileId(atchFileId);
+            fileMapper.insertFileGroup(groupVO);
+        }
+
+        // 2. 물리적 저장 경로 준비 (날짜별 폴더)
+        String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        Path targetDir = Paths.get(uploadPath, today);
+        if (!Files.exists(targetDir)) {
+            Files.createDirectories(targetDir);
+        }
+
+        // 3. 파일 순번 구하기
+        List<CmsFileVO> existingFiles = fileMapper.selectFileList(atchFileId);
+        int fileSn = existingFiles.size();
+
+        String originalName = file.getOriginalFilename();
+        String ext = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+        String storeName = UUID.randomUUID().toString() + "." + ext;
+        long size = file.getSize();
+
+        // 4. 물리 파일 저장
+        File targetFile = new File(targetDir.toFile(), storeName);
+        file.transferTo(targetFile);
+
+        // 5. 메타데이터 추출 (이미지인 경우)
+        int width = 0;
+        int height = 0;
+        if (isImage(ext)) {
+            try {
+                java.awt.image.BufferedImage bimg = javax.imageio.ImageIO.read(targetFile);
+                if (bimg != null) {
+                    width = bimg.getWidth();
+                    height = bimg.getHeight();
+                }
+            } catch (Exception e) {
+                // 이미지 읽기 실패 시 무시
+            }
+        }
+
+        // 6. DB 상세 정보 저장
+        CmsFileVO detailVO = new CmsFileVO();
+        detailVO.setAtchFileId(atchFileId);
+        detailVO.setFileSn(fileSn);
+        detailVO.setFileStreCours(targetDir.toString());
+        detailVO.setStreFileNm(storeName);
+        detailVO.setOrignlFileNm(originalName);
+        detailVO.setFileExtsn(ext);
+        detailVO.setFileCn(metaVO.getFileCn()); // 설명
+        detailVO.setFileSize(size);
+        detailVO.setThumbAt("N");
+        
+        // DAM 메타데이터
+        detailVO.setFileWidth(width);
+        detailVO.setFileHeight(height);
+        detailVO.setFileTy(file.getContentType());
+        detailVO.setAuthor(metaVO.getAuthor());
+        detailVO.setTags(metaVO.getTags());
+        detailVO.setFolderId(metaVO.getFolderId());
+
+        fileMapper.insertFileDetail(detailVO);
+
+        return atchFileId;
+    }
+
+    /* 폴더 관리 구현 */
+    @Override
+    @Transactional
+    public void createFolder(String folderNm, String upperFolderId) {
+        com.nucms.cms.model.CmsMediaFolderVO vo = new com.nucms.cms.model.CmsMediaFolderVO();
+        vo.setFolderId("FLD_" + UUID.randomUUID().toString().substring(0, 10).toUpperCase());
+        vo.setFolderNm(folderNm);
+        vo.setUpperFolderId(upperFolderId);
+        fileMapper.insertMediaFolder(vo);
+    }
+
+    @Override
+    @Transactional
+    public void updateFolder(String folderId, String folderNm, String upperFolderId) {
+        com.nucms.cms.model.CmsMediaFolderVO vo = new com.nucms.cms.model.CmsMediaFolderVO();
+        vo.setFolderId(folderId);
+        vo.setFolderNm(folderNm);
+        vo.setUpperFolderId(upperFolderId);
+        fileMapper.updateMediaFolder(vo);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFolder(String folderId) {
+        fileMapper.deleteMediaFolder(folderId);
+        // TODO: 폴더 내 파일 처리 정책 (삭제 or 이동) 필요. 현재는 폴더만 삭제됨.
+        // 실제로는 하위 파일들의 folderId를 null로 업데이트하거나 같이 삭제해야 함.
+    }
+
+    @Override
+    public List<com.nucms.cms.model.CmsMediaFolderVO> getFolderList() {
+        return fileMapper.selectMediaFolderList(new com.nucms.cms.model.CmsMediaFolderVO());
+    }
+
+    @Override
     public List<CmsFileVO> getMediaLibraryList(CmsFileVO vo) {
         return fileMapper.selectMediaLibraryList(vo);
     }
 
     private boolean isImage(String ext) {
+        if (ext == null) return false;
         return List.of("jpg", "jpeg", "png", "gif", "bmp", "webp").contains(ext.toLowerCase());
     }
 }

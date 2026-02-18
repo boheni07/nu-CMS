@@ -1,18 +1,11 @@
 package com.nucms.cms.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * CMS 페이지뷰 통계 VO
- */
-@Getter
-@Setter
+@Data
 public class CmsStatsVO implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     /** 통계 ID */
@@ -36,7 +29,9 @@ public class CmsStatsVO implements Serializable {
     /** 기록 시점 */
     private LocalDateTime creatPnttm;
 
-    /** 통계 가공용 필드 */
-    private long statsCount;
-    private String statsLabel;
+    /* 조회용 필드 */
+    private String startDate; // 검색 시작일
+    private String endDate;   // 검색 종료일
+    private Long pvCount;     // PV 수
+    private Long userCount;   // 방문자 수
 }

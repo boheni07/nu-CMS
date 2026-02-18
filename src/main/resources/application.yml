@@ -20,3 +20,7 @@ logging:
   level:
     egovframework: debug
     com.nucms: debug
+
+cms:
+  file:
+    upload-path: c:/Users/asus/dev/nu-CMS/uploads

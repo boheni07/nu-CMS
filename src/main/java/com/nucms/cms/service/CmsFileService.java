@@ -31,4 +31,13 @@ public interface CmsFileService {
 
     /** 미디어 라이브러리 목록 조희 */
     List<CmsFileVO> getMediaLibraryList(CmsFileVO vo);
+
+    /* DAM 관련 추가 메소드 */
+    String uploadFileWithMetadata(MultipartFile file, CmsFileVO metaVO) throws Exception;
+    
+    // 폴더 관리
+    void createFolder(String folderNm, String upperFolderId);
+    void updateFolder(String folderId, String folderNm, String upperFolderId);
+    void deleteFolder(String folderId);
+    List<com.nucms.cms.model.CmsMediaFolderVO> getFolderList();
 }

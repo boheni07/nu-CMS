@@ -1,0 +1,33 @@
+* Host localhost:8080 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:8080...
+* Established connection to localhost (::1 port 8080) from ::1 port 55312 
+* using HTTP/1.x
+> POST /api/cms/dam/upload HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/8.16.0
+> Accept: */*
+> Content-Length: 239
+> Content-Type: multipart/form-data; boundary=------------------------ZjrUka2ZHgbLQTVrQQGFqo
+> 
+} [239 bytes data]
+* upload completely sent off: 239 bytes
+< HTTP/1.1 500 
+< Vary: Origin
+< Vary: Access-Control-Request-Method
+< Vary: Access-Control-Request-Headers
+< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+< Pragma: no-cache
+< Expires: 0
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Wed, 18 Feb 2026 05:11:16 GMT
+< Connection: close
+< 
+{ [326 bytes data]
+100   558    0   319  100   239   7888   5910 --:--:-- --:--:-- --:--:-- 13950
+* shutting down connection #0
+{"success":false,"message":"IOException: java.io.FileNotFoundException: C:\\Users\\asus\\AppData\\Local\\Temp\\tomcat.8080.1742941683964767430\\work\\Tomcat\\localhost\\ROOT\\.\\uploads\\cms\\20260218\\6c136eb2-9169-4788-94f2-fc7406e26594.txt (지정된 경로를 찾을 수 없습니다)","data":null,"errorCode":null}
