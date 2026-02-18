@@ -30,7 +30,7 @@ const AuditLogList = () => {
     const fetchAccessLogs = async (params = {}) => {
         setAccessLoading(true);
         try {
-            const response = await axios.get('/api/cms/access-log', { params });
+            const response = await axios.get('/cms/access-log', { params });
             if (response.data.success) {
                 setAccessLogs(response.data.data);
             }
@@ -59,7 +59,7 @@ const AuditLogList = () => {
     const fetchAuditLogs = async (params = {}) => {
         setAuditLoading(true);
         try {
-            const response = await axios.get('/api/cms/audit-log', { params });
+            const response = await axios.get('/cms/audit-log', { params });
             if (response.data.success) {
                 setAuditLogs(response.data.data);
             }

@@ -17,7 +17,7 @@ const SystemConfig = () => {
     const fetchConfigs = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/api/cms/config');
+            const response = await axios.get('/cms/config');
             if (response.data.success) {
                 const configList = response.data.data;
                 const configMap = {};
@@ -38,7 +38,7 @@ const SystemConfig = () => {
     const onFinish = async (values) => {
         setLoading(true);
         try {
-            const response = await axios.post('/api/cms/config/save', values);
+            const response = await axios.post('/cms/config/save', values);
             if (response.data.success) {
                 message.success('설정이 저장되었습니다.');
                 // 설정 변경 후 필요한 경우 새로고침 안내

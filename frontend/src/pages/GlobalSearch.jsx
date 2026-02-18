@@ -14,7 +14,7 @@ const GlobalSearch = () => {
         if (!value.trim()) return;
         setLoading(true);
         try {
-            const response = await axios.get('/api/cms/board/search', { params: { keyword: value } });
+            const response = await axios.get('/cms/board/search', { params: { keyword: value } });
             if (response.data.success) {
                 setResults(response.data.data);
                 setKeyword(value);
