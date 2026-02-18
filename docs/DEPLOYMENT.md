@@ -23,7 +23,9 @@ CREATE DATABASE nucms DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 1. `create_member_tables.sql` (회원/권한)
 2. `create_workflow_tables.sql` (워크플로우)
 3. `create_dam_tables.sql` (미디어/DAM)
-4. `FIX_...` (기타 보정 스크립트가 있다면 실행)
+4. `create_category_table.sql` (카테고리 - 신규 추가)
+5. `create_menu_role_table.sql` (메뉴 권한 - 신규 추가)
+6. `FIX_...` (기타 보정 스크립트가 있다면 실행)
 
 ## 3. 백엔드 설정 및 실행 (Backend)
 

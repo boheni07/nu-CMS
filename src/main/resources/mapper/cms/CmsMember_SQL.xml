@@ -36,8 +36,12 @@
             MBER_NM AS mberNm,
             EMAIL_ADRES AS emailAdres,
             MBER_STTUS_CODE AS mberSttusCode,
-            FRST_REGIST_PNTTM AS frstRegistPnttm
-        FROM CMS_MEMBER
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            (SELECT GROUP_CONCAT(R.ROLE_NM SEPARATOR ', ')
+             FROM CMS_MEMBER_ROLE MR
+             JOIN CMS_ROLE R ON MR.ROLE_CODE = R.ROLE_CODE
+             WHERE MR.ESNTL_ID = A.ESNTL_ID) AS roleNms
+        FROM CMS_MEMBER A
         <where>
             <if test="mberId != null and mberId != ''">
                 AND MBER_ID LIKE CONCAT('%', #{mberId}, '%')

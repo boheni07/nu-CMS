@@ -46,4 +46,7 @@ public class CmsMemberVO implements Serializable {
 
     /** 회원이 보유한 역할 목록 (Security 연동용) */
     private java.util.List<String> roleList;
+
+    /** 회원이 보유한 역할 명 목록 (Display용, 콤마 구분) */
+    private String roleNms;
 }

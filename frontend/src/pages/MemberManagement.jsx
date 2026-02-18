@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Tag, Space, Button, Card, Breadcrumb, message, Modal, Select, Form, Input, Badge } from 'antd';
-import { UserOutlined, KeyOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { UserOutlined, KeyOutlined, StopOutlined, CheckCircleOutlined, PlusOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import CmsService from '../api/services/cms';
 
 const { Option } = Select;
@@ -9,9 +9,16 @@ const MemberManagement = () => {
     const [members, setMembers] = useState([]);
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // 권한 관리 모달 상태
     const [roleModalVisible, setRoleModalVisible] = useState(false);
     const [selectedMember, setSelectedMember] = useState(null);
-    const [form] = Form.useForm();
+    const [roleForm] = Form.useForm();
+
+    // 회원 등록/수정 모달 상태
+    const [memberModalVisible, setMemberModalVisible] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [memberForm] = Form.useForm();
 
     useEffect(() => {
         fetchMembers();
@@ -51,13 +58,16 @@ const MemberManagement = () => {
         }
     };
 
+    // ========================================================================
+    // 권한(Role) 관리
+    // ========================================================================
     const showRoleModal = async (member) => {
         setSelectedMember(member);
         setRoleModalVisible(true);
         try {
             const data = await CmsService.member.getDetail(member.esntlId);
             if (data) {
-                form.setFieldsValue({
+                roleForm.setFieldsValue({
                     roleCodes: data.roleList || []
                 });
             }
@@ -76,6 +86,47 @@ const MemberManagement = () => {
             }
         } catch (error) {
             message.error('권한 저장에 실패했습니다.');
+        }
+    };
+
+    // ========================================================================
+    // 회원 등록/수정
+    // ========================================================================
+    const showCreateModal = () => {
+        setIsEdit(false);
+        setSelectedMember(null);
+        memberForm.resetFields();
+        setMemberModalVisible(true);
+    };
+
+    const showEditModal = (member) => {
+        setIsEdit(true);
+        setSelectedMember(member);
+        memberForm.setFieldsValue({
+            mberId: member.mberId,
+            mberNm: member.mberNm,
+            emailAdres: member.emailAdres,
+            mbtlnum: member.mbtlnum,
+            mberSttusCode: member.mberSttusCode,
+            password: '', // 비밀번호는 수정 시 비워둠 (입력 시 변경)
+        });
+        setMemberModalVisible(true);
+    };
+
+    const handleMemberSubmit = async (values) => {
+        try {
+            if (isEdit) {
+                await CmsService.member.update(selectedMember.esntlId, values);
+                message.success('회원 정보가 수정되었습니다.');
+            } else {
+                await CmsService.member.regist(values);
+                message.success('신규 회원이 등록되었습니다.');
+            }
+            setMemberModalVisible(false);
+            fetchMembers();
+        } catch (error) {
+            console.error(error);
+            message.error(error.response?.data?.message || '저장에 실패했습니다.');
         }
     };
 
@@ -110,6 +161,28 @@ const MemberManagement = () => {
             ellipsis: true,
         },
         {
+            title: '역할',
+            dataIndex: 'roleNms',
+            key: 'roleNms',
+            width: 150,
+            ellipsis: true,
+            render: (text) => text ? (
+                <Space size={0} wrap>
+                    {text.split(', ').map((role, index) => (
+                        <Tag key={index} color="blue">{role}</Tag>
+                    ))}
+                </Space>
+            ) : <span style={{ color: '#ccc' }}>-</span>,
+        },
+        {
+            title: '휴대폰',
+            dataIndex: 'mbtlnum',
+            key: 'mbtlnum',
+            width: 120,
+            align: 'center',
+            render: (text) => text || '-',
+        },
+        {
             title: '상태',
             dataIndex: 'mberSttusCode',
             key: 'mberSttusCode',
@@ -130,22 +203,21 @@ const MemberManagement = () => {
             title: '가입일',
             dataIndex: 'frstRegistPnttm',
             key: 'frstRegistPnttm',
-            width: 120,
+            width: 100,
             align: 'center',
             render: (date) => date ? new Date(date).toLocaleDateString() : '-',
         },
         {
             title: '관리',
             key: 'action',
-            width: 180,
+            width: 200,
             align: 'center',
             render: (_, record) => (
                 <Space size="small">
-                    <Button
-                        size="small"
-                        icon={<KeyOutlined />}
-                        onClick={() => showRoleModal(record)}
-                    >
+                    <Button size="small" icon={<EditOutlined />} onClick={() => showEditModal(record)}>
+                        수정
+                    </Button>
+                    <Button size="small" icon={<KeyOutlined />} onClick={() => showRoleModal(record)}>
                         권한
                     </Button>
                     {record.mberSttusCode === 'A' ? (
@@ -183,7 +255,12 @@ const MemberManagement = () => {
 
             <Card
                 title={<span><UserOutlined /> 회원 관리</span>}
-                extra={<Button type="primary" onClick={fetchMembers}>새로고침</Button>}
+                extra={
+                    <Space>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={showCreateModal}>신규 회원</Button>
+                        <Button icon={<ReloadOutlined />} onClick={fetchMembers}>새로고침</Button>
+                    </Space>
+                }
             >
                 <Table
                     columns={columns}
@@ -195,14 +272,15 @@ const MemberManagement = () => {
                 />
             </Card>
 
+            {/* 권한 설정 모달 */}
             <Modal
-                title={`권한 설정 - ${selectedMember?.mberId} (${selectedMember?.mberNm})`}
+                title={`권한 설정 - ${selectedMember?.mberId}`}
                 open={roleModalVisible}
-                onOk={() => form.submit()}
+                onOk={() => roleForm.submit()}
                 onCancel={() => setRoleModalVisible(false)}
                 destroyOnClose
             >
-                <Form form={form} onFinish={handleRoleSave} layout="vertical">
+                <Form form={roleForm} onFinish={handleRoleSave} layout="vertical">
                     <Form.Item
                         name="roleCodes"
                         label="부여할 역할 선택"
@@ -214,6 +292,65 @@ const MemberManagement = () => {
                                     {role.roleNm} ({role.roleCode})
                                 </Option>
                             ))}
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* 회원 등록/수정 모달 */}
+            <Modal
+                title={isEdit ? '회원 정보 수정' : '신규 회원 등록'}
+                open={memberModalVisible}
+                onOk={() => memberForm.submit()}
+                onCancel={() => setMemberModalVisible(false)}
+                destroyOnClose
+            >
+                <Form form={memberForm} onFinish={handleMemberSubmit} layout="vertical">
+                    <Form.Item
+                        name="mberId"
+                        label="회원 ID"
+                        rules={[{ required: true, message: '아이디를 입력하세요.' }]}
+                    >
+                        <Input disabled={isEdit} placeholder="아이디 입력" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="mberNm"
+                        label="이름"
+                        rules={[{ required: true, message: '이름을 입력하세요.' }]}
+                    >
+                        <Input placeholder="이름 입력" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="password"
+                        label={isEdit ? "비밀번호 (변경 시에만 입력)" : "비밀번호"}
+                        rules={[{ required: !isEdit, message: '비밀번호를 입력하세요.' }]}
+                    >
+                        <Input.Password placeholder="비밀번호 입력" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="emailAdres"
+                        label="이메일"
+                        rules={[
+                            { required: true, message: '이메일을 입력하세요.' },
+                            { type: 'email', message: '유효한 이메일 형식이 아닙니다.' }
+                        ]}
+                    >
+                        <Input placeholder="example@nucms.com" />
+                    </Form.Item>
+
+                    <Form.Item name="mbtlnum" label="휴대폰 번호">
+                        <Input placeholder="010-0000-0000" />
+                    </Form.Item>
+
+                    <Form.Item name="mberSttusCode" label="상태" initialValue="A">
+                        <Select>
+                            <Option value="A">정상</Option>
+                            <Option value="R">승인대기</Option>
+                            <Option value="P">잠금</Option>
+                            <Option value="D">탈퇴</Option>
                         </Select>
                     </Form.Item>
                 </Form>

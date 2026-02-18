@@ -40,6 +40,16 @@ const CmsService = {
         /** 회원 권한(Role) 저장 */
         saveRoles: async (esntlId, roleCodes) => {
             return await axios.post(`/cms/member/${esntlId}/roles`, roleCodes);
+        },
+
+        /** 회원 등록 */
+        regist: async (data) => {
+            return await axios.post('/cms/member', data);
+        },
+
+        /** 회원 정보 수정 */
+        update: async (esntlId, data) => {
+            return await axios.put(`/cms/member/${esntlId}`, data);
         }
     },
 

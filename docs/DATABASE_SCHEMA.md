@@ -18,6 +18,7 @@
 | 테이블명 | 설명 | 주요 컬럼 |
 | :--- | :--- | :--- |
 | `CMS_CONTENT` | 정적 페이지 콘텐츠 | `CNT_ID` (PK), `CNT_SJ` (제목), `CNT_CN` (내용), `USE_AT` |
+| `CMS_CATEGORY` | 콘텐츠 카테고리 | `CTGRY_ID` (PK), `CTGRY_NM`, `UPPER_CTGRY_ID`, `USE_AT` |
 | `CMS_BOARD_MASTER` | 게시판 설정 | `BBS_ID` (PK), `BBS_NM`, `BBS_TY_CODE` (유형) |
 | `CMS_BOARD_POST` | 게시글 | `NTT_ID` (PK), `BBS_ID` (FK), `NTT_SJ`, `NTT_CN` |
 
@@ -38,6 +39,7 @@
 | 테이블명 | 설명 | 주요 컬럼 |
 | :--- | :--- | :--- |
 | `CMS_MENU` | 메뉴 구조 | `MENU_ID` (PK), `UPPER_MENU_ID`, `MENU_NM`, `CONECT_URL` |
+| `CMS_MENU_ROLE` | 메뉴 권한 | `MENU_ID` (PK, FK), `ROLE_CODE` (PK, FK) |
 | `CMS_WIDGET` | 위젯 설정 | `WIDGET_ID` (PK), `WIDGET_TY_CODE`, `WIDGET_CN` |
 | `CMS_ACCESS_LOG` | 접근 로그 | `LOG_ID` (PK), `CONECT_IP`, `CONECT_URL` |
 
