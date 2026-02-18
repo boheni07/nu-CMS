@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsAccessLogMapper">
+
+    <select id="selectAccessLogList" parameterType="com.nucms.cms.model.CmsAccessLogVO" resultType="com.nucms.cms.model.CmsAccessLogVO">
+        SELECT
+            L.LOG_ID AS logId,
+            L.ESNTL_ID AS esntlId,
+            L.CONECT_IP AS conectIp,
+            L.CONECT_METHOD AS conectMethod,
+            L.CONECT_URL AS conectUrl,
+            L.LOG_CN AS logCn,
+            L.CREAT_PNTTM AS creatPnttm,
+            M.MBER_NM AS mberNm
+        FROM CMS_ACCESS_LOG L
+        LEFT JOIN CMS_MEMBER M ON L.ESNTL_ID = M.ESNTL_ID
+        <where>
+            <if test="mberNm != null and mberNm != ''">
+                AND M.MBER_NM LIKE CONCAT('%', #{mberNm}, '%')
+            </if>
+            <if test="conectIp != null and conectIp != ''">
+                AND L.CONECT_IP LIKE CONCAT('%', #{conectIp}, '%')
+            </if>
+            <if test="conectUrl != null and conectUrl != ''">
+                AND L.CONECT_URL LIKE CONCAT('%', #{conectUrl}, '%')
+            </if>
+        </where>
+        ORDER BY L.CREAT_PNTTM DESC
+    </select>
+
+    <insert id="insertAccessLog" parameterType="com.nucms.cms.model.CmsAccessLogVO">
+        INSERT INTO CMS_ACCESS_LOG (
+            ESNTL_ID, CONECT_IP, CONECT_METHOD, CONECT_URL, LOG_CN
+        ) VALUES (
+            #{esntlId}, #{conectIp}, #{conectMethod}, #{conectUrl}, #{logCn}
+        )
+    </insert>
+
+    <select id="selectAccessLog" parameterType="long" resultType="com.nucms.cms.model.CmsAccessLogVO">
+        SELECT
+            LOG_ID AS logId,
+            ESNTL_ID AS esntlId,
+            CONECT_IP AS conectIp,
+            CONECT_METHOD AS conectMethod,
+            CONECT_URL AS conectUrl,
+            LOG_CN AS logCn,
+            CREAT_PNTTM AS creatPnttm
+        FROM CMS_ACCESS_LOG
+        WHERE LOG_ID = #{logId}
+    </select>
+
+</mapper>

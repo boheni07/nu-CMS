@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsConfigMapper">
+
+    <select id="selectConfigList" resultType="com.nucms.cms.model.CmsConfigVO">
+        SELECT
+            CONFIG_ID,
+            CONFIG_KEY,
+            CONFIG_VAL,
+            CONFIG_DC,
+            USE_AT,
+            FRST_REGIST_PNTTM,
+            FRST_REGISTER_ID,
+            LAST_UPDT_PNTTM,
+            LAST_UPDUSR_ID
+        FROM CMS_SY_CONFIG
+        WHERE USE_AT = 'Y'
+        <if test="configKey != null and configKey != ''">
+            AND CONFIG_KEY = #{configKey}
+        </if>
+        ORDER BY CONFIG_KEY ASC
+    </select>
+    
+    <select id="selectConfig" resultType="com.nucms.cms.model.CmsConfigVO">
+        SELECT *
+        FROM CMS_SY_CONFIG
+        WHERE CONFIG_KEY = #{configKey}
+    </select>
+    
+    <insert id="insertConfig">
+        INSERT INTO CMS_SY_CONFIG (
+            CONFIG_ID, CONFIG_KEY, CONFIG_VAL, CONFIG_DC, USE_AT, FRST_REGISTER_ID
+        ) VALUES (
+            #{configId}, #{configKey}, #{configVal}, #{configDc}, #{useAt}, #{frstRegisterId}
+        )
+    </insert>
+    
+    <update id="updateConfig">
+        UPDATE CMS_SY_CONFIG
+        SET CONFIG_VAL = #{configVal},
+            LAST_UPDT_PNTTM = NOW(),
+            LAST_UPDUSR_ID = #{lastUpdusrId}
+        WHERE CONFIG_KEY = #{configKey}
+    </update>
+    
+</mapper>

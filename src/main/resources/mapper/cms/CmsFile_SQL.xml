@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsFileMapper">
+
+    <insert id="insertFileGroup" parameterType="com.nucms.cms.model.CmsFileVO">
+        INSERT INTO CMS_FILE_GROUP (
+            ATCH_FILE_ID, USE_AT
+        ) VALUES (
+            #{atchFileId}, 'Y'
+        )
+    </insert>
+
+    <insert id="insertFileDetail" parameterType="com.nucms.cms.model.CmsFileVO">
+        INSERT INTO CMS_FILE_DETAIL (
+            ATCH_FILE_ID, FILE_SN, FILE_STRE_COURS, STRE_FILE_NM,
+            ORIGNL_FILE_NM, FILE_EXTSN, FILE_CN, FILE_SIZE, THUMB_AT
+        ) VALUES (
+            #{atchFileId}, #{fileSn}, #{fileStreCours}, #{streFileNm},
+            #{orignlFileNm}, #{fileExtsn}, #{fileCn}, #{fileSize}, #{thumbAt}
+        )
+    </insert>
+
+    <select id="selectFileList" parameterType="String" resultType="com.nucms.cms.model.CmsFileVO">
+        SELECT
+            ATCH_FILE_ID AS atchFileId,
+            FILE_SN AS fileSn,
+            STRE_FILE_NM AS streFileNm,
+            ORIGNL_FILE_NM AS orignlFileNm,
+            FILE_EXTSN AS fileExtsn,
+            FILE_SIZE AS fileSize,
+            THUMB_AT AS thumbAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_FILE_DETAIL
+        WHERE ATCH_FILE_ID = #{atchFileId}
+        ORDER BY FILE_SN ASC
+    </select>
+
+    <select id="selectFileDetail" parameterType="com.nucms.cms.model.CmsFileVO" resultType="com.nucms.cms.model.CmsFileVO">
+        SELECT
+            ATCH_FILE_ID AS atchFileId,
+            FILE_SN AS fileSn,
+            FILE_STRE_COURS AS fileStreCours,
+            STRE_FILE_NM AS streFileNm,
+            ORIGNL_FILE_NM AS orignlFileNm,
+            FILE_EXTSN AS fileExtsn,
+            FILE_SIZE AS fileSize,
+            THUMB_AT AS thumbAt
+        FROM CMS_FILE_DETAIL
+        WHERE ATCH_FILE_ID = #{atchFileId}
+          AND FILE_SN = #{fileSn}
+    </select>
+
+    <delete id="deleteFileDetails" parameterType="com.nucms.cms.model.CmsFileVO">
+        DELETE FROM CMS_FILE_DETAIL
+        WHERE ATCH_FILE_ID = #{atchFileId}
+        <if test="fileSns != null">
+            AND FILE_SN IN
+            <foreach item="sn" collection="fileSns" open="(" separator="," close=")">
+                #{sn}
+            </foreach>
+        </if>
+    </delete>
+
+    <delete id="deleteFileGroup" parameterType="String">
+        DELETE FROM CMS_FILE_GROUP
+        WHERE ATCH_FILE_ID = #{atchFileId}
+    </delete>
+
+    <select id="selectMediaLibraryList" parameterType="com.nucms.cms.model.CmsFileVO" resultType="com.nucms.cms.model.CmsFileVO">
+        SELECT
+            ATCH_FILE_ID AS atchFileId,
+            FILE_SN AS fileSn,
+            STRE_FILE_NM AS streFileNm,
+            ORIGNL_FILE_NM AS orignlFileNm,
+            FILE_EXTSN AS fileExtsn,
+            FILE_SIZE AS fileSize,
+            THUMB_AT AS thumbAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_FILE_DETAIL
+        <where>
+            <if test="orignlFileNm != null and orignlFileNm != ''">
+                AND ORIGNL_FILE_NM LIKE CONCAT('%', #{orignlFileNm}, '%')
+            </if>
+            <if test="fileExtsn != null and fileExtsn != ''">
+                AND FILE_EXTSN = #{fileExtsn}
+            </if>
+            <!-- 라이브러리에서는 썸네일 파일이 아닌 원본만 노출할 수도 있음 -->
+            AND THUMB_AT = 'N'
+        </where>
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+</mapper>

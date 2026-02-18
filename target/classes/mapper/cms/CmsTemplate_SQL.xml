@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsTemplateMapper">
+
+    <select id="selectCmsTemplate" parameterType="String" resultType="com.nucms.cms.model.CmsTemplateVO">
+        SELECT
+            TMPLAT_ID AS tmplatId,
+            TMPLAT_NM AS tmplatNm,
+            TMPLAT_SE_CODE AS tmplatSeCode,
+            TMPLAT_COURS AS tmplatCours,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_TEMPLATE
+        WHERE TMPLAT_ID = #{tmplatId}
+    </select>
+
+    <select id="selectCmsTemplateList" parameterType="com.nucms.cms.model.CmsTemplateVO" resultType="com.nucms.cms.model.CmsTemplateVO">
+        SELECT
+            TMPLAT_ID AS tmplatId,
+            TMPLAT_NM AS tmplatNm,
+            TMPLAT_SE_CODE AS tmplatSeCode,
+            TMPLAT_COURS AS tmplatCours,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_TEMPLATE
+        <where>
+            <if test="tmplatNm != null and tmplatNm != ''">
+                AND TMPLAT_NM LIKE CONCAT('%', #{tmplatNm}, '%')
+            </if>
+            <if test="useAt != null and useAt != ''">
+                AND USE_AT = #{useAt}
+            </if>
+        </where>
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+    <insert id="insertCmsTemplate" parameterType="com.nucms.cms.model.CmsTemplateVO">
+        INSERT INTO CMS_TEMPLATE (
+            TMPLAT_ID, TMPLAT_NM, TMPLAT_SE_CODE, TMPLAT_COURS, USE_AT
+        ) VALUES (
+            #{tmplatId}, #{tmplatNm}, #{tmplatSeCode}, #{tmplatCours}, #{useAt}
+        )
+    </insert>
+
+    <update id="updateCmsTemplate" parameterType="com.nucms.cms.model.CmsTemplateVO">
+        UPDATE CMS_TEMPLATE
+        SET TMPLAT_NM = #{tmplatNm},
+            TMPLAT_SE_CODE = #{tmplatSeCode},
+            TMPLAT_COURS = #{tmplatCours},
+            USE_AT = #{useAt}
+        WHERE TMPLAT_ID = #{tmplatId}
+    </update>
+
+    <delete id="deleteCmsTemplate" parameterType="String">
+        DELETE FROM CMS_TEMPLATE
+        WHERE TMPLAT_ID = #{tmplatId}
+    </delete>
+
+</mapper>

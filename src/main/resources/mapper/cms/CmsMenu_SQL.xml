@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsMenuMapper">
+
+    <select id="selectCmsMenu" parameterType="String" resultType="com.nucms.cms.model.CmsMenuVO">
+        SELECT
+            MENU_ID AS menuId,
+            UPPER_MENU_ID AS upperMenuId,
+            MENU_NM AS menuNm,
+            MENU_LVL AS menuLvl,
+            MENU_TY_CODE AS menuTyCode,
+            CONECT_URL AS conectUrl,
+            EXPSR_ORDR AS expsrOrdr,
+            USE_AT AS useAt
+        FROM CMS_MENU
+        WHERE MENU_ID = #{menuId}
+    </select>
+
+    <select id="selectCmsMenuList" parameterType="com.nucms.cms.model.CmsMenuVO" resultType="com.nucms.cms.model.CmsMenuVO">
+        SELECT
+            MENU_ID AS menuId,
+            UPPER_MENU_ID AS upperMenuId,
+            MENU_NM AS menuNm,
+            MENU_LVL AS menuLvl,
+            MENU_TY_CODE AS menuTyCode,
+            CONECT_URL AS conectUrl,
+            EXPSR_ORDR AS expsrOrdr,
+            USE_AT AS useAt
+        FROM CMS_MENU
+        <where>
+            <if test="upperMenuId != null and upperMenuId != ''">
+                AND UPPER_MENU_ID = #{upperMenuId}
+            </if>
+            <if test="menuNm != null and menuNm != ''">
+                AND MENU_NM LIKE CONCAT('%', #{menuNm}, '%')
+            </if>
+        </where>
+        ORDER BY EXPSR_ORDR ASC
+    </select>
+
+    <insert id="insertCmsMenu" parameterType="com.nucms.cms.model.CmsMenuVO">
+        INSERT INTO CMS_MENU (
+            MENU_ID, UPPER_MENU_ID, MENU_NM, MENU_LVL, MENU_TY_CODE, CONECT_URL, EXPSR_ORDR, USE_AT
+        ) VALUES (
+            #{menuId}, #{upperMenuId, jdbcType=VARCHAR}, #{menuNm}, #{menuLvl}, #{menuTyCode}, #{conectUrl}, #{expsrOrdr}, #{useAt}
+        )
+    </insert>
+
+    <update id="updateCmsMenu" parameterType="com.nucms.cms.model.CmsMenuVO">
+        UPDATE CMS_MENU
+        SET UPPER_MENU_ID = #{upperMenuId, jdbcType=VARCHAR},
+            MENU_NM = #{menuNm},
+            MENU_LVL = #{menuLvl},
+            MENU_TY_CODE = #{menuTyCode},
+            CONECT_URL = #{conectUrl},
+            EXPSR_ORDR = #{expsrOrdr},
+            USE_AT = #{useAt}
+        WHERE MENU_ID = #{menuId}
+    </update>
+
+    <delete id="deleteCmsMenu" parameterType="String">
+        DELETE FROM CMS_MENU
+        WHERE MENU_ID = #{menuId}
+    </delete>
+
+</mapper>

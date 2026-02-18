@@ -1,0 +1,19 @@
+USE nucms;
+
+-- CMS_MENU 테이블에 누락된 컬럼들을 추가하는 스크립트입니다.
+-- 이미 컬럼이 존재한다는 에러(Duplicate column name)가 발생하면 성공한 것으로 간주하고 무시하셔도 됩니다.
+
+-- 1. MENU_LVL (메뉴 레벨) 컬럼 추가
+ALTER TABLE CMS_MENU ADD COLUMN MENU_LVL INT DEFAULT 1 COMMENT '메뉴 레벨';
+
+-- 2. MENU_TY_CODE (메뉴 유형) 컬럼 추가
+ALTER TABLE CMS_MENU ADD COLUMN MENU_TY_CODE VARCHAR(10) DEFAULT 'CONT' COMMENT '메뉴 유형(LINK, CONT, WIDG)';
+
+-- 3. CONECT_URL (연결 URL) 컬럼 추가
+ALTER TABLE CMS_MENU ADD COLUMN CONECT_URL VARCHAR(255) COMMENT '연결 URL';
+
+-- 4. EXPSR_ORDR (노출 순서) 컬럼 추가
+ALTER TABLE CMS_MENU ADD COLUMN EXPSR_ORDR INT DEFAULT 0 COMMENT '노출 순서';
+
+-- 5. USE_AT (사용 여부) 컬럼 추가
+ALTER TABLE CMS_MENU ADD COLUMN USE_AT CHAR(1) DEFAULT 'Y' COMMENT '사용 여부';

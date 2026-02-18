@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsLayoutConfigMapper">
+
+    <select id="selectLayoutConfigList" parameterType="String" resultType="com.nucms.cms.model.CmsLayoutConfigVO">
+        SELECT
+            C.CONFIG_ID AS configId,
+            C.TMPLAT_ID AS tmplatId,
+            C.AREA_NM AS areaNm,
+            C.WIDGET_ID AS widgetId,
+            C.EXPSR_ORDR AS expsrOrdr,
+            W.WIDGET_NM AS widgetNm
+        FROM CMS_LAYOUT_CONFIG C
+        LEFT JOIN CMS_WIDGET W ON C.WIDGET_ID = W.WIDGET_ID
+        WHERE C.TMPLAT_ID = #{tmplatId}
+        ORDER BY C.AREA_NM ASC, C.EXPSR_ORDR ASC
+    </select>
+
+    <insert id="insertLayoutConfig" parameterType="com.nucms.cms.model.CmsLayoutConfigVO">
+        INSERT INTO CMS_LAYOUT_CONFIG (
+            TMPLAT_ID, AREA_NM, WIDGET_ID, EXPSR_ORDR
+        ) VALUES (
+            #{tmplatId}, #{areaNm}, #{widgetId}, #{expsrOrdr}
+        )
+    </insert>
+
+    <delete id="deleteLayoutConfigByTmplat" parameterType="String">
+        DELETE FROM CMS_LAYOUT_CONFIG
+        WHERE TMPLAT_ID = #{tmplatId}
+    </delete>
+
+</mapper>

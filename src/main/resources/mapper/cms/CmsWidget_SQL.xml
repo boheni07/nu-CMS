@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsWidgetMapper">
+
+    <select id="selectCmsWidget" parameterType="String" resultType="com.nucms.cms.model.CmsWidgetVO">
+        SELECT
+            WIDGET_ID AS widgetId,
+            WIDGET_NM AS widgetNm,
+            WIDGET_TY_CODE AS widgetTyCode,
+            WIDGET_CN AS widgetCn,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_WIDGET
+        WHERE WIDGET_ID = #{widgetId}
+    </select>
+
+    <select id="selectCmsWidgetList" parameterType="com.nucms.cms.model.CmsWidgetVO" resultType="com.nucms.cms.model.CmsWidgetVO">
+        SELECT
+            WIDGET_ID AS widgetId,
+            WIDGET_NM AS widgetNm,
+            WIDGET_TY_CODE AS widgetTyCode,
+            WIDGET_CN AS widgetCn,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_WIDGET
+        <where>
+            <if test="widgetTyCode != null and widgetTyCode != ''">
+                AND WIDGET_TY_CODE = #{widgetTyCode}
+            </if>
+            <if test="widgetNm != null and widgetNm != ''">
+                AND WIDGET_NM LIKE CONCAT('%', #{widgetNm}, '%')
+            </if>
+            <if test="useAt != null and useAt != ''">
+                AND USE_AT = #{useAt}
+            </if>
+        </where>
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+    <insert id="insertCmsWidget" parameterType="com.nucms.cms.model.CmsWidgetVO">
+        INSERT INTO CMS_WIDGET (
+            WIDGET_ID, WIDGET_NM, WIDGET_TY_CODE, WIDGET_CN, USE_AT,
+            FRST_REGIST_PNTTM
+        ) VALUES (
+            #{widgetId}, #{widgetNm}, #{widgetTyCode}, #{widgetCn}, #{useAt},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateCmsWidget" parameterType="com.nucms.cms.model.CmsWidgetVO">
+        UPDATE CMS_WIDGET
+        SET WIDGET_NM = #{widgetNm},
+            WIDGET_TY_CODE = #{widgetTyCode},
+            WIDGET_CN = #{widgetCn},
+            USE_AT = #{useAt}
+        WHERE WIDGET_ID = #{widgetId}
+    </update>
+
+    <delete id="deleteCmsWidget" parameterType="String">
+        DELETE FROM CMS_WIDGET
+        WHERE WIDGET_ID = #{widgetId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsContentMapper">
+
+    <select id="selectCmsContent" parameterType="String" resultType="com.nucms.cms.model.CmsContentVO">
+        SELECT
+            CNTENTS_ID AS cntentsId,
+            SJ AS sj,
+            CN AS cn,
+            WRTER_ID AS wrterId,
+            STTUS_CODE AS sttusCode,
+            VER_NO AS verNo,
+            TMPLAT_ID AS tmplatId,
+            CTGRY_ID AS ctgryId,
+            NTCE_BGNDE AS ntceBgnde,
+            NTCE_ENDDE AS ntceEndde,
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            LAST_UPDT_PNTTM AS lastUpdtPnttm
+        FROM CMS_CONTENT
+        WHERE CNTENTS_ID = #{cntentsId}
+    </select>
+
+    <select id="selectCmsContentList" parameterType="com.nucms.cms.model.CmsContentVO" resultType="com.nucms.cms.model.CmsContentVO">
+        SELECT
+            CNTENTS_ID AS cntentsId,
+            SJ AS sj,
+            CN AS cn,
+            WRTER_ID AS wrterId,
+            STTUS_CODE AS sttusCode,
+            VER_NO AS verNo,
+            TMPLAT_ID AS tmplatId,
+            CTGRY_ID AS ctgryId,
+            NTCE_BGNDE AS ntceBgnde,
+            NTCE_ENDDE AS ntceEndde,
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            LAST_UPDT_PNTTM AS lastUpdtPnttm
+        FROM CMS_CONTENT
+        <where>
+            <if test="sj != null and sj != ''">
+                AND SJ LIKE CONCAT('%', #{sj}, '%')
+            </if>
+            <if test="sttusCode != null and sttusCode != ''">
+                AND STTUS_CODE = #{sttusCode}
+            </if>
+        </where>
+        ORDER BY LAST_UPDT_PNTTM DESC
+    </select>
+
+    <insert id="insertCmsContent" parameterType="com.nucms.cms.model.CmsContentVO">
+        INSERT INTO CMS_CONTENT (
+            CNTENTS_ID, SJ, CN, WRTER_ID, STTUS_CODE, VER_NO, 
+            TMPLAT_ID, CTGRY_ID, NTCE_BGNDE, NTCE_ENDDE,
+            FRST_REGIST_PNTTM, LAST_UPDT_PNTTM
+        ) VALUES (
+            #{cntentsId}, #{sj}, #{cn}, #{wrterId}, #{sttusCode}, #{verNo}, 
+            #{tmplatId}, #{ctgryId}, #{ntceBgnde}, #{ntceEndde},
+            NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateCmsContent" parameterType="com.nucms.cms.model.CmsContentVO">
+        UPDATE CMS_CONTENT
+        SET SJ = #{sj},
+            CN = #{cn},
+            STTUS_CODE = #{sttusCode},
+            VER_NO = #{verNo},
+            TMPLAT_ID = #{tmplatId},
+            CTGRY_ID = #{ctgryId},
+            NTCE_BGNDE = #{ntceBgnde},
+            NTCE_ENDDE = #{ntceEndde},
+            LAST_UPDT_PNTTM = NOW()
+        WHERE CNTENTS_ID = #{cntentsId}
+    </update>
+
+    <delete id="deleteCmsContent" parameterType="String">
+        DELETE FROM CMS_CONTENT
+        WHERE CNTENTS_ID = #{cntentsId}
+    </delete>
+
+    <insert id="insertCmsContentHist" parameterType="com.nucms.cms.model.CmsContentVO">
+        INSERT INTO CMS_CONTENT_HIST (
+            CNTENTS_ID, SJ, CN, WRTER_ID, STTUS_CODE, VER_NO, TMPLAT_ID, UPDT_PNTTM
+        ) VALUES (
+            #{cntentsId}, #{sj}, #{cn}, #{wrterId}, #{sttusCode}, #{verNo}, #{tmplatId}, NOW()
+        )
+    </insert>
+
+    <update id="rollbackCmsContent" parameterType="map">
+        UPDATE CMS_CONTENT C, CMS_CONTENT_HIST H
+        SET C.SJ = H.SJ,
+            C.CN = H.CN,
+            C.STTUS_CODE = 'I',
+            C.VER_NO = C.VER_NO + 1,
+            C.TMPLAT_ID = H.TMPLAT_ID,
+            C.LAST_UPDT_PNTTM = NOW()
+        WHERE C.CNTENTS_ID = H.CNTENTS_ID
+          AND C.CNTENTS_ID = #{cntentsId}
+          AND H.HIST_ID = #{histId}
+    </update>
+
+    <select id="selectCmsContentHistList" parameterType="String" resultType="map">
+        SELECT
+            HIST_ID AS histId,
+            CNTENTS_ID AS cntentsId,
+            SJ AS sj,
+            CN AS cn,
+            WRTER_ID AS wrterId,
+            STTUS_CODE AS sttusCode,
+            VER_NO AS verNo,
+            TMPLAT_ID AS tmplatId,
+            UPDT_PNTTM AS updtPnttm
+        FROM CMS_CONTENT_HIST
+        WHERE CNTENTS_ID = #{cntentsId}
+        ORDER BY UPDT_PNTTM DESC
+    </select>
+
+</mapper>

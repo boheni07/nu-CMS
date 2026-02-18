@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsCategoryMapper">
+
+    <select id="selectCategoryList" resultType="map">
+        SELECT
+            CTGRY_ID AS ctgryId,
+            UPPER_CTGRY_ID AS upperCtgryId,
+            CTGRY_NM AS ctgryNm,
+            USE_AT AS useAt
+        FROM CMS_CATEGORY
+        ORDER BY CTGRY_ID ASC
+    </select>
+
+    <insert id="insertCategory" parameterType="map">
+        INSERT INTO CMS_CATEGORY (
+            CTGRY_ID, UPPER_CTGRY_ID, CTGRY_NM, USE_AT
+        ) VALUES (
+            #{ctgryId}, #{upperCtgryId}, #{ctgryNm}, #{useAt}
+        )
+    </insert>
+
+    <update id="updateCategory" parameterType="map">
+        UPDATE CMS_CATEGORY
+        SET UPPER_CTGRY_ID = #{upperCtgryId},
+            CTGRY_NM = #{ctgryNm},
+            USE_AT = #{useAt}
+        WHERE CTGRY_ID = #{ctgryId}
+    </update>
+
+    <delete id="deleteCategory" parameterType="String">
+        DELETE FROM CMS_CATEGORY
+        WHERE CTGRY_ID = #{ctgryId}
+    </delete>
+
+</mapper>

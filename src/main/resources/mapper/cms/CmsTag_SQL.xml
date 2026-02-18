@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsTagMapper">
+
+    <select id="selectTagListByContentId" parameterType="String" resultType="map">
+        SELECT
+            T.TAG_ID AS tagId,
+            T.TAG_NM AS tagNm
+        FROM CMS_TAG T
+        JOIN CMS_CONTENT_TAG_MAP M ON T.TAG_ID = M.TAG_ID
+        WHERE M.CNTENTS_ID = #{cntentsId}
+    </select>
+
+    <insert id="insertTag" parameterType="map">
+        INSERT INTO CMS_TAG (TAG_ID, TAG_NM)
+        VALUES (#{tagId}, #{tagNm})
+        ON DUPLICATE KEY UPDATE TAG_NM = #{tagNm}
+    </insert>
+
+    <delete id="deleteTagMapByContentId" parameterType="String">
+        DELETE FROM CMS_CONTENT_TAG_MAP
+        WHERE CNTENTS_ID = #{cntentsId}
+    </delete>
+
+    <insert id="insertContentTagMap" parameterType="map">
+        INSERT INTO CMS_CONTENT_TAG_MAP (CNTENTS_ID, TAG_ID)
+        VALUES (#{cntentsId}, #{tagId})
+    </insert>
+
+</mapper>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsBoardMapper">
+
+    <!-- 게시판 마스터 -->
+    <select id="selectBoardMasterList" parameterType="com.nucms.cms.model.CmsBoardMasterVO" resultType="com.nucms.cms.model.CmsBoardMasterVO">
+        SELECT
+            BBS_ID AS bbsId,
+            BBS_NM AS bbsNm,
+            BBS_INTRCN AS bbsIntrcn,
+            BBS_TY_CODE AS bbsTyCode,
+            REPLY_POSBL_AT AS replyPosblAt,
+            FILE_ATCH_POSBL_AT AS fileAtchPosblAt,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_BOARD_MASTER
+        <where>
+            <if test="bbsNm != null and bbsNm != ''">
+                AND BBS_NM LIKE CONCAT('%', #{bbsNm}, '%')
+            </if>
+        </where>
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+    <select id="selectBoardMaster" parameterType="String" resultType="com.nucms.cms.model.CmsBoardMasterVO">
+        SELECT
+            BBS_ID AS bbsId,
+            BBS_NM AS bbsNm,
+            BBS_INTRCN AS bbsIntrcn,
+            BBS_TY_CODE AS bbsTyCode,
+            REPLY_POSBL_AT AS replyPosblAt,
+            FILE_ATCH_POSBL_AT AS fileAtchPosblAt,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_BOARD_MASTER
+        WHERE BBS_ID = #{bbsId}
+    </select>
+
+    <select id="selectBoardMasterDetail" parameterType="com.nucms.cms.model.CmsBoardMasterVO" resultType="com.nucms.cms.model.CmsBoardMasterVO">
+        SELECT
+            BBS_ID AS bbsId,
+            BBS_NM AS bbsNm,
+            BBS_INTRCN AS bbsIntrcn,
+            BBS_TY_CODE AS bbsTyCode,
+            REPLY_POSBL_AT AS replyPosblAt,
+            FILE_ATCH_POSBL_AT AS fileAtchPosblAt,
+            USE_AT AS useAt,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_BOARD_MASTER
+        WHERE BBS_ID = #{bbsId}
+    </select>
+
+    <insert id="insertBoardMaster" parameterType="com.nucms.cms.model.CmsBoardMasterVO">
+        INSERT INTO CMS_BOARD_MASTER (
+            BBS_ID, BBS_NM, BBS_INTRCN, BBS_TY_CODE,
+            REPLY_POSBL_AT, FILE_ATCH_POSBL_AT, USE_AT, FRST_REGIST_PNTTM,
+            FRST_REGISTER_ID
+        ) VALUES (
+            #{bbsId}, #{bbsNm}, #{bbsIntrcn}, #{bbsTyCode},
+            #{replyPosblAt}, #{fileAtchPosblAt}, #{useAt}, NOW(),
+            #{frstRegisterId}
+        )
+    </insert>
+
+    <update id="updateBoardMaster" parameterType="com.nucms.cms.model.CmsBoardMasterVO">
+        UPDATE CMS_BOARD_MASTER
+        SET
+            BBS_NM = #{bbsNm},
+            BBS_INTRCN = #{bbsIntrcn},
+            BBS_TY_CODE = #{bbsTyCode},
+            USE_AT = #{useAt}
+        WHERE BBS_ID = #{bbsId}
+    </update>
+
+    <delete id="deleteBoardMaster" parameterType="String">
+        DELETE FROM CMS_BOARD_MASTER WHERE BBS_ID = #{bbsId}
+    </delete>
+
+    <!-- 게시글 -->
+    <select id="selectBoardPostList" parameterType="com.nucms.cms.model.CmsBoardPostVO" resultType="com.nucms.cms.model.CmsBoardPostVO">
+        SELECT
+            P.NTT_ID AS nttId,
+            P.BBS_ID AS bbsId,
+            P.NTT_SJ AS nttSj,
+            P.RDCNT AS rdcnt,
+            P.USE_AT AS useAt,
+            P.FRST_REGISTER_ID AS frstRegisterId,
+            P.FRST_REGIST_PNTTM AS frstRegistPnttm,
+            M.MBER_NM AS frstRegisterNm
+        FROM CMS_BOARD_POST P
+        LEFT JOIN CMS_MEMBER M ON P.FRST_REGISTER_ID = M.MBER_ID
+        WHERE P.BBS_ID = #{bbsId}
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchCondition == 'title'">
+                    AND P.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <otherwise>
+                    AND (P.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%') OR P.NTT_CN LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY P.FRST_REGIST_PNTTM DESC
+    </select>
+
+    <select id="selectBoardPost" parameterType="long" resultType="com.nucms.cms.model.CmsBoardPostVO">
+        SELECT
+            NTT_ID AS nttId,
+            BBS_ID AS bbsId,
+            NTT_SJ AS nttSj,
+            NTT_CN AS nttCn,
+            RDCNT AS rdcnt,
+            ATCH_FILE_ID AS atchFileId,
+            FRST_REGISTER_ID AS frstRegisterId,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_BOARD_POST
+        WHERE NTT_ID = #{nttId}
+    </select>
+
+    <insert id="insertBoardPost" parameterType="com.nucms.cms.model.CmsBoardPostVO">
+        INSERT INTO CMS_BOARD_POST (
+            BBS_ID, NTT_SJ, NTT_CN, ATCH_FILE_ID, FRST_REGISTER_ID,
+            FRST_REGIST_PNTTM
+        ) VALUES (
+            #{bbsId}, #{nttSj}, #{nttCn}, #{atchFileId}, #{frstRegisterId},
+            NOW()
+        )
+    </insert>
+
+    <update id="updateBoardPost" parameterType="com.nucms.cms.model.CmsBoardPostVO">
+        UPDATE CMS_BOARD_POST
+        SET
+            NTT_SJ = #{nttSj},
+            NTT_CN = #{nttCn}
+        WHERE NTT_ID = #{nttId}
+    </update>
+
+    <delete id="deleteBoardPost" parameterType="long">
+        DELETE FROM CMS_BOARD_POST WHERE NTT_ID = #{nttId}
+    </delete>
+
+    <update id="updateRdcnt" parameterType="long">
+        UPDATE CMS_BOARD_POST SET RDCNT = RDCNT + 1 WHERE NTT_ID = #{nttId}
+    </update>
+
+    <!-- 전역 검색 (통합 검색) -->
+    <select id="selectGlobalSearchList" parameterType="String" resultType="com.nucms.cms.model.CmsBoardPostVO">
+        SELECT
+            NTT_ID AS nttId,
+            BBS_ID AS bbsId,
+            NTT_SJ AS nttSj,
+            SUBSTR(NTT_CN, 1, 200) AS nttCn,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_BOARD_POST
+        WHERE NTT_SJ LIKE CONCAT('%', #{keyword}, '%')
+           OR NTT_CN LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsWorkflowLogMapper">
+
+    <insert id="insertWorkflowLog" parameterType="map">
+        INSERT INTO CMS_WORKFLOW_LOG (
+            CNTENTS_ID, PRE_STTUS_CODE, AFT_STTUS_CODE, PROCR_ID, PROCESS_CN
+        ) VALUES (
+            #{cntentsId}, #{preStatusCode}, #{aftStatusCode}, #{procrId}, #{processCn}
+        )
+    </insert>
+
+</mapper>

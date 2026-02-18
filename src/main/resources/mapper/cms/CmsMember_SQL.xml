@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsMemberMapper">
+
+    <select id="selectCmsMember" parameterType="String" resultType="com.nucms.cms.model.CmsMemberVO">
+        SELECT
+            ESNTL_ID AS esntlId,
+            MBER_ID AS mberId,
+            MBER_NM AS mberNm,
+            PASSWORD AS password,
+            EMAIL_ADRES AS emailAdres,
+            MBTLNUM AS mbtlnum,
+            MBER_STTUS_CODE AS mberSttusCode,
+            DI_KEY AS diKey,
+            FRST_REGIST_PNTTM AS frstRegistPnttm,
+            LAST_UPDT_PNTTM AS lastUpdtPnttm
+        FROM CMS_MEMBER
+        WHERE ESNTL_ID = #{esntlId}
+    </select>
+
+    <select id="selectCmsMemberById" parameterType="String" resultType="com.nucms.cms.model.CmsMemberVO">
+        SELECT
+            ESNTL_ID AS esntlId,
+            MBER_ID AS mberId,
+            MBER_NM AS mberNm,
+            PASSWORD AS password,
+            MBER_STTUS_CODE AS mberSttusCode
+        FROM CMS_MEMBER
+        WHERE MBER_ID = #{mberId}
+    </select>
+
+    <select id="selectCmsMemberList" parameterType="com.nucms.cms.model.CmsMemberVO" resultType="com.nucms.cms.model.CmsMemberVO">
+        SELECT
+            ESNTL_ID AS esntlId,
+            MBER_ID AS mberId,
+            MBER_NM AS mberNm,
+            EMAIL_ADRES AS emailAdres,
+            MBER_STTUS_CODE AS mberSttusCode,
+            FRST_REGIST_PNTTM AS frstRegistPnttm
+        FROM CMS_MEMBER
+        <where>
+            <if test="mberId != null and mberId != ''">
+                AND MBER_ID LIKE CONCAT('%', #{mberId}, '%')
+            </if>
+            <if test="mberNm != null and mberNm != ''">
+                AND MBER_NM LIKE CONCAT('%', #{mberNm}, '%')
+            </if>
+            <if test="mberSttusCode != null and mberSttusCode != ''">
+                AND MBER_STTUS_CODE = #{mberSttusCode}
+            </if>
+        </where>
+        ORDER BY FRST_REGIST_PNTTM DESC
+    </select>
+
+    <insert id="insertCmsMember" parameterType="com.nucms.cms.model.CmsMemberVO">
+        INSERT INTO CMS_MEMBER (
+            ESNTL_ID, MBER_ID, MBER_NM, PASSWORD, EMAIL_ADRES, MBTLNUM, MBER_STTUS_CODE, DI_KEY
+        ) VALUES (
+            #{esntlId}, #{mberId}, #{mberNm}, #{password}, #{emailAdres}, #{mbtlnum}, #{mberSttusCode}, #{diKey}
+        )
+    </insert>
+
+    <update id="updateCmsMember" parameterType="com.nucms.cms.model.CmsMemberVO">
+        UPDATE CMS_MEMBER
+        SET MBER_NM = #{mberNm},
+            EMAIL_ADRES = #{emailAdres},
+            MBTLNUM = #{mbtlnum},
+            MBER_STTUS_CODE = #{mberSttusCode}
+            <if test="password != null and password != ''">
+                , PASSWORD = #{password}
+            </if>
+        WHERE ESNTL_ID = #{esntlId}
+    </update>
+
+    <update id="updateCmsMemberStatus" parameterType="com.nucms.cms.model.CmsMemberVO">
+        UPDATE CMS_MEMBER
+        SET MBER_STTUS_CODE = #{mberSttusCode}
+        WHERE ESNTL_ID = #{esntlId}
+    </update>
+
+    <delete id="deleteCmsMember" parameterType="String">
+        DELETE FROM CMS_MEMBER
+        WHERE ESNTL_ID = #{esntlId}
+    </delete>
+
+    <insert id="insertMemberRole" parameterType="map">
+        INSERT INTO CMS_MEMBER_ROLE (ESNTL_ID, ROLE_CODE)
+        VALUES (#{esntlId}, #{roleCode})
+    </insert>
+
+    <delete id="deleteMemberRoles" parameterType="String">
+        DELETE FROM CMS_MEMBER_ROLE
+        WHERE ESNTL_ID = #{esntlId}
+    </delete>
+
+    <select id="selectMemberRoleList" parameterType="String" resultType="String">
+        SELECT ROLE_CODE
+        FROM CMS_MEMBER_ROLE
+        WHERE ESNTL_ID = #{esntlId}
+    </select>
+
+</mapper>

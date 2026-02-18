@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nucms.cms.mapper.CmsAuditLogMapper">
+
+    <select id="selectLogList" resultType="com.nucms.cms.model.CmsAuditLogVO">
+        SELECT
+            LOG_ID,
+            ACTION_TY,
+            MENU_ID,
+            TARGET_ID,
+            TARGET_NM,
+            CASE WHEN LENGTH(BEFORE_VAL) > 100 THEN CONCAT(LEFT(BEFORE_VAL, 100), '...') ELSE BEFORE_VAL END AS BEFORE_VAL,
+            CASE WHEN LENGTH(AFTER_VAL) > 100 THEN CONCAT(LEFT(AFTER_VAL, 100), '...') ELSE AFTER_VAL END AS AFTER_VAL,
+            CLIENT_IP,
+            USER_ID,
+            USER_NM,
+            CREAT_DT
+        FROM CMS_AUDIT_LOG
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            AND (TARGET_NM LIKE CONCAT('%', #{searchKeyword}, '%') OR USER_NM LIKE CONCAT('%', #{searchKeyword}, '%'))
+        </if>
+        <if test="menuId != null and menuId != ''">
+            AND MENU_ID = #{menuId}
+        </if>
+        ORDER BY LOG_ID DESC
+        LIMIT 1000
+    </select>
+    
+    <select id="selectLog" resultType="com.nucms.cms.model.CmsAuditLogVO">
+        SELECT *
+        FROM CMS_AUDIT_LOG
+        WHERE LOG_ID = #{logId}
+    </select>
+    
+    <insert id="insertLog">
+        INSERT INTO CMS_AUDIT_LOG (
+            ACTION_TY, MENU_ID, TARGET_ID, TARGET_NM, BEFORE_VAL, AFTER_VAL, CLIENT_IP, USER_ID, USER_NM
+        ) VALUES (
+            #{actionTy}, #{menuId}, #{targetId}, #{targetNm}, #{beforeVal}, #{afterVal}, #{clientIp}, #{userId}, #{userNm}
+        )
+    </insert>
+    
+</mapper>
